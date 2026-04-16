@@ -5,7 +5,15 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: '#ED1C24',
+        secondary: '#2D2926',
+      },
+      fontFamily: {
+        audiowide: ['"Audiowide"', 'cursive'],
+      }
+    },
   },
   plugins: [],
 }
