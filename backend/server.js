@@ -3,6 +3,7 @@ const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const path = require('path')
+const authRoutes = require('./routes/authRoutes');
 
 require('dotenv').config();
 
@@ -20,6 +21,7 @@ app.get('/api/health',(req, res)=>{
 })
 
 //Routes
+app.use('/user',authRoutes);
 
 
 //Start Server
