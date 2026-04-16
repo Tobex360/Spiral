@@ -1,0 +1,2 @@
+brown = #2D2926
+red = #ED1C24
