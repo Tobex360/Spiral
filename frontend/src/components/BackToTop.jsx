@@ -35,8 +35,8 @@ function BackToTop() {
         icon={<VerticalAlignTopOutlined />}
         onClick={scrollToTop}
         style={{
-          backgroundColor: '#0D4715',
-          borderColor: '#0D4715',
+          backgroundColor: '#2D2926',
+          borderColor: '#2D2926',
           width: '50px',
           height: '50px',
           display: 'flex',
@@ -49,7 +49,7 @@ function BackToTop() {
           transition: 'all 0.3s ease-in-out',
           transform: isVisible ? 'scale(1)' : 'scale(0.5)',
         }}
-        className="hover:!bg-[#E9762B] hover:!border-[#E9762B] hover:-translate-y-1"
+        className="hover:!bg-primary hover:!border-primary hover:-translate-y-1"
       />
     </div>
   );
