@@ -16,7 +16,7 @@ function Footer() {
       
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
-        {/* 🔥 Logo (Centered) */}
+        {/* Logo (Centered) */}
         <div className="flex justify-center mb-12">
           <Link 
             to="/" 
@@ -29,7 +29,7 @@ function Footer() {
           </Link>
         </div>
 
-        {/* 🔥 Responsive Grid */}
+        {/* Responsive Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 text-center md:text-left justify-center">
           
           {/* Quick Links */}
