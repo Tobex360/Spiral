@@ -31,13 +31,13 @@ function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden sm:flex items-center gap-8">
           <div className="flex gap-6">
-            <NavLink to="/" label="Login" />
+            <NavLink to="/login" label="Login" />
           </div>
           
           <div className="h-6 w-[1px] bg-white/20 mx-2" /> {/* Divider */}
 
           <div className="flex items-center gap-4">
-            <NavLink to="/" label="Register" />
+            <NavLink to="/register" label="Register" />
           </div>
         </div>
 
