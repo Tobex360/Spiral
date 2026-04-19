@@ -5,7 +5,7 @@ require('dotenv').config();
 const secretKey = process.env.JWT_SECRET;
 
 async function registerUser(req,res){
-    let{username, email, password,} = req.body;
+    let{firstname, lastname, username, email, password,} = req.body;
 
     try{
         const duplicate = await User.find({username});
@@ -14,6 +14,8 @@ async function registerUser(req,res){
         }
 
         let user = new User({
+            firstname,
+            lastname,
             username,
             email,
             password,
