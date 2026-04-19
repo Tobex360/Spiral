@@ -12,6 +12,9 @@ export default {
       },
       fontFamily: {
         audiowide: ['"Audiowide"', 'cursive'],
+        rubik: ['"Rubik Glitch"', 'cursive'],
+        tomorrow: ['"Tomorrow"', 'cursive'],
+        wallpoet: ['"Wallpoet"', 'cursive'],
       }
     },
   },
