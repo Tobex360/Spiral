@@ -8,15 +8,15 @@
 @tailwind utilities;
 
 html {
-  @apply bg-[#0d0d0f];
+  @apply bg-black;
 }
 
 body {
-  @apply bg-[#0d0d0f] text-white;
+  @apply bg-black text-white;
 }
 html {
   scroll-behavior: smooth;
-  @apply bg-[#0d0d0f];
+  @apply bg-black;
 }
 
 /* Css */
