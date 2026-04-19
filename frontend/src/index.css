@@ -1,7 +1,8 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
-
-
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tomorrow:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Wallpoet&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,4 +17,14 @@ body {
 html {
   scroll-behavior: smooth;
   @apply bg-[#0d0d0f];
+}
+
+/* Css */
+
+.footer-link {
+  @apply text-white text-sm hover:text-primary transition-colors;
+}
+
+.social-icon {
+  @apply text-xl text-white hover:text-primary transition-transform hover:-translate-y-1;
 }
