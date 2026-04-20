@@ -5,7 +5,7 @@ import H1 from '../../assets/landing1.svg'
 import H2 from '../../assets/landing2.svg'
 import H3 from '../../assets/landing3.svg'
 import H4 from '../../assets/landing4.svg'
-import { Divider } from "../../components/Reuseable";
+import { Divider, Btn } from "../../components/Reuseable";
 
 const FEATURES = [
   {
@@ -78,6 +78,7 @@ function Landing() {
         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
           From retro classics to next-gen blockbusters, we have more than 500,000 games ready for your verdict.
         </p>
+        <Btn to="/">Explore</Btn>
       </section>
 
       <Divider />
