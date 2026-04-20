@@ -4,6 +4,7 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 const path = require('path')
 const authRoutes = require('./routes/authRoutes');
+const gameRoutes = require("./routes/gameRoutes")
 
 require('dotenv').config();
 
@@ -24,6 +25,7 @@ app.get('/api/health',(req, res)=>{
 
 //Routes
 app.use('/user',authRoutes);
+app.use('/api/games',gameRoutes);
 
 
 //Start Server
