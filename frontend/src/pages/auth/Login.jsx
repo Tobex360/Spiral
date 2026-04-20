@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Input, Button, message, Form, Card, Typography, Row, Col, Space } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import User from "../../assets/user.jpg";
@@ -10,10 +10,34 @@ import {
 } from '@ant-design/icons';
 import './login.css';
 import axios from 'axios';
+import AuthServices from '../../services/authServices';
+import Password from 'antd/es/input/Password';
 
 const { Title, Text } = Typography;
 
 function Login() {
+
+  const[loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (values) =>{
+      console.log("Form values being sent:", values);
+    setLoading(true);
+    try{
+  
+    const response = await AuthServices.loginUser(values);
+    localStorage.setItem('user', JSON.stringify(response.data));
+    window.dispatchEvent(new Event('authChange'));
+    message.success("User Logged In");
+    navigate('/home');
+    }catch(err){
+      
+      console.log(err);
+      message.error("Invalid username or password");
+    } finally{
+      setLoading(false)
+    }
+  }
   return (
     <div className="login-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '20px' }}>
       <Card 
@@ -40,7 +64,7 @@ function Login() {
           <Title level={3} style={{ marginBottom: '4px', color: ' #ED1C24'}}>Login</Title>
         </div>
 
-        <Form layout="vertical" size="large" requiredMark={false}>
+        <Form layout="vertical" size="large" requiredMark={false} onFinish={handleSubmit}>
 
           <Form.Item name="username" rules={[{ required: true, message: 'Username is required' }]}>
             <Input prefix={<UserOutlined style={{ color: '#bfbfbf' }} />} placeholder="Username" style={{ borderRadius: '8px' }} />
@@ -55,13 +79,13 @@ function Login() {
               type="primary" 
               htmlType="submit" 
               block 
-              // loading={loading}
+              loading={loading}
               style={{ 
                 height: '50px', 
                 borderRadius: '8px', 
                 fontWeight: 'bold', 
                 fontSize: '16px',
-                background: '#E9762B',
+                background: '#ED1C24',
                 border: 'none'
               }}
             >

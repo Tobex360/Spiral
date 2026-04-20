@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './login.css';
 import { Input, Button, message, Form, Card, Typography, Row, Col, Space } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import User from "../../assets/user.jpg";
+import AuthServices from '../../services/authServices';
 import { 
   UserOutlined, 
   MailOutlined, 
@@ -15,6 +16,34 @@ const { Title, Text } = Typography;
 
 
 function Register() {
+
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (values)=>{
+    setLoading(true);
+    try{
+      const data = {
+        firstname: values.firstname,
+        lastname: values.Lastname,
+        username: values.username,
+        email: values.email,
+        password: values.password
+      }
+      await AuthServices.registerUser(data);
+      message.success("You are successfully Registered")
+      navigate('/login')
+    }catch(err){
+      message.error(`Regitration Failed: ${err}`)
+    }finally{
+      setLoading(false);
+    }
+  }
+
+
+
+
+
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '20px'}}>
       <Card 
@@ -41,7 +70,7 @@ function Register() {
           <Title level={3} style={{ marginBottom: '4px', color: '#ED1C24'}}>Create Account</Title>
         </div>
 
-        <Form layout="vertical" size="large" requiredMark={false}>
+        <Form layout="vertical" size="large" requiredMark={false} onFinish={handleSubmit}>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="firstname" rules={[{ required: true, message: 'First name is required' }]}>

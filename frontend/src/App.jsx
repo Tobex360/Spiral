@@ -5,6 +5,7 @@ import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import Home from './pages/Home/Home'
 import BackToTop from './components/BackToTop'
 
 
@@ -16,6 +17,7 @@ function App() {
         <Route path='/' element={<Landing />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
+        <Route path='/home' element={<Home />} />
       </Routes>
       <Footer />
       <BackToTop />
