@@ -56,8 +56,8 @@ function Navbar() {
     {/* Mobile Navigation Menu */}
     <div className={`sm:hidden bg-secondary overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-64 border-b border-[#0D4715]/10' : 'max-h-0'}`}>
       <div className="px-4 pt-2 pb-6 space-y-2 flex flex-col items-center">
-        <Link to="/" className="w-full text-center py-3 text-primary text-lg font-bold font-audiowide hover:bg-[#0D4715]/5 rounded-lg">Login</Link>
-        <Link to="/" className="w-full text-center py-3 text-primary text-lg font-bold font-audiowide hover:bg-[#0D4715]/5 rounded-lg">Register</Link>
+        <Link to="/login" className="w-full text-center py-3 text-primary text-lg font-bold font-audiowide hover:bg-[#0D4715]/5 rounded-lg">Login</Link>
+        <Link to="/register" className="w-full text-center py-3 text-primary text-lg font-bold font-audiowide hover:bg-[#0D4715]/5 rounded-lg">Register</Link>
         
       </div>
     </div>
