@@ -11,6 +11,8 @@ const DB_URL = process.env.DB_URL;
 const PORT = process.env.PORT || 2001;
 
 //Enable Cors
+app.use(cors())
+
 
 //Parse json bodies
 app.use(express.json());
