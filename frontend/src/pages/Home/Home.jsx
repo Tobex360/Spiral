@@ -4,6 +4,7 @@ import { Input, Spin, Pagination, Empty, ConfigProvider, theme } from 'antd'
 import { SearchOutlined, StarFilled } from '@ant-design/icons'
 import axios from 'axios'
 import { API_URL } from '../../config/api'
+import { useNavigate } from 'react-router-dom'
 
 function Home() {
   const [games, setGames] = useState([])
@@ -11,6 +12,8 @@ function Home() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+
+  const navigate = useNavigate()
 
   const fetchGames = async () => {
     try {
@@ -105,7 +108,7 @@ function Home() {
                         </h3>
                         <div className="flex justify-between items-center mt-2">
                            <span className="text-[10px] text-gray-500 uppercase tracking-tighter">Released: {game.released?.split('-')[0]}</span>
-                           <button className="text-[10px] bg-white/5 hover:bg-red-500 hover:text-white px-2 py-1 rounded transition-colors uppercase font-bold">
+                           <button className="text-[10px] bg-white/5 hover:bg-red-500 hover:text-white px-2 py-1 rounded transition-colors uppercase font-bold" onClick={()=>{navigate(`/gamedetails/${game.id}`)}}>
                              Details
                            </button>
                         </div>

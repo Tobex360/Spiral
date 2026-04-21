@@ -10,6 +10,7 @@ import BackToTop from './components/BackToTop'
 
 import Home from './pages/Home/Home'
 import Profile from './pages/User/Profile'
+import GameDetails from './pages/Home/GameDetails'
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
 
         <Route path='/home' element={<Home />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/gamedetails/:gameId' element={<GameDetails />} />
       </Routes>
       <Footer />
       <BackToTop />
