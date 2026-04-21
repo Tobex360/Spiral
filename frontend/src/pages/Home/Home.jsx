@@ -34,7 +34,7 @@ function Home() {
   return (
     // Set Ant Design to Dark Mode for the pagination/input components
     <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
-      <main className='min-h-screen bg-[#0a0a0a] text-white pb-20'>
+      <main className='min-h-screen pb-20'>
         
         {/* 🔥 Header Section */}
         <div className='relative overflow-hidden bg-black py-16 mb-12'>

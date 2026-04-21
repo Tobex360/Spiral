@@ -66,7 +66,7 @@ function Navbar() {
     },
     {
       label: (
-        <span onClick={()=>navigate('/')}>
+        <span onClick={()=>navigate('/profile')}>
           profile
         </span>
       ),
