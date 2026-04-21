@@ -1,48 +1,55 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Spin } from "antd";
+import { Spin, Modal, Rate, Input, message, Button, Tag } from "antd";
+import { EditOutlined, DeleteOutlined, MessageOutlined } from "@ant-design/icons";
+
+const { TextArea } = Input;
 
 function GameDetails() {
   const { gameId } = useParams();
 
+  // State
   const [game, setGame] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
+  // Form State
   const [rating, setRating] = useState(5);
   const [text, setText] = useState("");
 
-  // 🎮 Fetch Game
+  // Edit Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+  const [editRating, setEditRating] = useState(5);
+  const [editText, setEditText] = useState("");
+
   const fetchGame = async () => {
     try {
       const res = await axios.get(`/api/games/${gameId}`);
       setGame(res.data);
     } catch (err) {
-      console.error(err);
       setError("Failed to load game details");
     }
   };
 
-  // 💬 Fetch Reviews
   const fetchReviews = async () => {
     try {
       const res = await axios.get(`/api/reviews/game/${gameId}`);
       setReviews(res.data);
     } catch (err) {
       console.error(err);
-      // Maybe don't set error for reviews, as game is main
     }
   };
 
-  // ➕ Submit Review
   const submitReview = async () => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user || !user.token) {
-      alert('Please log in to submit a review');
+    if (!currentUser || !currentUser.token) {
+      message.error('Please log in to submit a review');
       return;
     }
+    if (!text.trim()) return message.warning("Please write something first!");
 
     try {
       await axios.post("/api/reviews", {
@@ -50,155 +57,206 @@ function GameDetails() {
         rating,
         reviewText: text,
       }, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
+        headers: { Authorization: `Bearer ${currentUser.token}` },
       });
 
       setText("");
+      setRating(5);
+      message.success("Review posted!");
       fetchReviews();
     } catch (err) {
-      console.error(err);
+      message.error("Failed to post review");
     }
   };
 
+  // ✏️ Open Modal for Edit
+  const openEditModal = (review) => {
+    setEditingReview(review);
+    setEditRating(review.rating);
+    setEditText(review.reviewText);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateReview = async () => {
+    try {
+      await axios.put(`/api/reviews/${editingReview._id}`, {
+        rating: editRating,
+        reviewText: editText,
+      }, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      message.success("Review updated!");
+      setIsEditModalOpen(false);
+      fetchReviews();
+    } catch (err) {
+      message.error("Update failed");
+    }
+  };
+
+  const deleteReview = async (reviewId) => {
+    Modal.confirm({
+      title: 'Delete Review',
+      content: 'Are you sure you want to remove this review? This cannot be undone.',
+      okText: 'Delete',
+      okType: 'danger',
+      onOk: async () => {
+        try {
+          await axios.delete(`/api/reviews/${reviewId}`, {
+            headers: { Authorization: `Bearer ${currentUser.token}` },
+          });
+          message.success("Review deleted");
+          fetchReviews();
+        } catch (err) {
+          message.error("Delete failed");
+        }
+      }
+    });
+  };
+
   useEffect(() => {
+    setCurrentUser(JSON.parse(localStorage.getItem('user')));
     const loadData = async () => {
       setLoading(true);
       await Promise.all([fetchGame(), fetchReviews()]);
       setLoading(false);
     };
-
     loadData();
   }, [gameId]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center mt-20">
-        <Spin size="large" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center mt-20">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
-
-  if (!game) {
-    return (
-      <div className="flex justify-center mt-20">
-        <p className="text-gray-500">Game not found</p>
-      </div>
-    );
-  }
+  if (loading) return <div className="flex justify-center items-center min-h-screen bg-black"><Spin size="large" /></div>;
+  if (error || !game) return <div className="text-center mt-20 text-red-500">{error || "Game not found"}</div>;
 
   return (
-    <main className="min-h-screen bg-black text-white px-6 md:px-12 py-10">
-      <div className="max-w-6xl mx-auto">
-
-        {/* 🎮 GAME HEADER */}
-        <div className="grid md:grid-cols-2 gap-10 mb-12">
-          
-          {/* Image */}
-          <img
-            src={game.background_image}
-            alt={game.name}
-            className="rounded-xl w-full h-[300px] object-cover"
-          />
-
-          {/* Info */}
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              {game.name}
-            </h1>
-
-            <p className="text-yellow-400 mb-2">
-              ⭐ {game.rating}
-            </p>
-
-            <div className="flex flex-wrap gap-2 mb-4">
-              {game.genres?.map((genre) => (
-                <span
-                  key={genre.id}
-                  className="bg-[#222] px-2 py-1 rounded text-xs"
-                >
-                  {genre.name}
-                </span>
-              ))}
-            </div>
-
-            <p className="text-gray-300 text-sm">
-              {game.description_raw?.slice(0, 300)}...
-            </p>
+    <main className="min-h-screen bg-[#0a0a0a] text-white pb-20">
+      {/* 🎮 HERO BANNER */}
+      <div className="relative h-[400px] w-full">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-10" />
+        <img src={game.background_image} alt="" className="w-full h-full object-cover opacity-40" />
+        
+        <div className="absolute bottom-0 left-0 w-full z-20 px-6 md:px-12 pb-10 max-w-7xl mx-auto right-0">
+          <h1 className="text-4xl md:text-6xl font-audiowide text-white mb-4 uppercase">{game.name}</h1>
+          <div className="flex items-center gap-4">
+            <Rate disabled defaultValue={game.rating} allowHalf className="text-red-500" />
+            <span className="text-xl font-bold">{game.rating} / 5</span>
           </div>
         </div>
+      </div>
 
-        {/* ✍️ REVIEW FORM */}
-        <div className="bg-[#111] p-4 rounded-xl mb-10">
-          <h2 className="text-lg mb-3">Write a Review</h2>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 -mt-10 relative z-30 grid lg:grid-cols-3 gap-10 pt-4">
+        
+        {/* LEFT: INFO & FORM */}
+        <div className="lg:col-span-2 space-y-10">
+          <section className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md">
+            <h2 className="text-red-500 font-tomorrow uppercase tracking-widest mb-4">About</h2>
+            <p className="text-gray-300 leading-relaxed">
+              {game.description_raw || "No description available."}
+            </p>
+            <div className="flex flex-wrap gap-2 mt-6">
+              {game.genres?.map(g => <Tag color="red" key={g.id} className="bg-secondary border-red-500/50 uppercase">{g.name}</Tag>)}
+            </div>
+          </section>
 
-          <select
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-            className="bg-black border border-gray-700 p-2 rounded mb-3"
-          >
-            {[1,2,3,4,5].map((num) => (
-              <option key={num} value={num}>
-                {num} ⭐
-              </option>
-            ))}
-          </select>
+          {/* ✍️ WRITE REVIEW */}
+          <section className="bg-white/5 border border-white/10 p-6 rounded-2xl">
+            <div className="flex items-center gap-2 mb-6">
+              <MessageOutlined className="text-red-500" />
+              <h2 className="text-xl font-audiowide uppercase">Leave a Review</h2>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-xs text-gray-500 uppercase mb-2">Your Rating</p>
+              <Rate value={rating} onChange={setRating} className="text-red-500" />
+            </div>
 
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Share your thoughts..."
-            className="w-full p-3 bg-black border border-gray-700 rounded mb-3"
-          />
+            <TextArea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="What's your take on this game?"
+              autoSize={{ minRows: 3 }}
+              className="bg-black/50 border-white/10 text-black rounded-lg hover:border-red-500 focus:border-red-500"
+            />
 
-          <button
-            onClick={submitReview}
-            className="bg-primary px-4 py-2 rounded hover:opacity-80"
-          >
-            Submit Review
-          </button>
+            <Button 
+              type="primary" 
+              danger 
+              size="large" 
+              onClick={submitReview}
+              className="mt-4 font-bold uppercase tracking-widest h-12 px-10"
+            >
+              Post Review
+            </Button>
+          </section>
         </div>
 
-        {/* 💬 REVIEWS */}
-        <div>
-          <h2 className="text-xl mb-6">Reviews</h2>
+        {/* RIGHT: REVIEWS LIST */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-audiowide uppercase flex items-center gap-3">
+            Community <span className="text-red-500">Feed</span>
+          </h2>
 
           {reviews.length === 0 ? (
-            <p className="text-gray-400">No reviews yet</p>
-          ) : (
-            <div className="space-y-4">
-              {reviews.map((review) => (
-                <div
-                  key={review._id}
-                  className="bg-[#111] p-4 rounded-xl"
-                >
-                  <p className="text-sm text-gray-400 mb-1">
-                    {review.userId?.username || "User"}
-                  </p>
-
-                  <p className="text-yellow-400 mb-2">
-                    ⭐ {review.rating}
-                  </p>
-
-                  <p className="text-gray-200">
-                    {review.reviewText}
-                  </p>
-                </div>
-              ))}
+            <div className="p-10 text-center bg-white/5 rounded-2xl border border-dashed border-white/20">
+              <p className="text-gray-500">No reviews yet. Be the first!</p>
             </div>
+          ) : (
+            reviews.map((r) => (
+              <div key={r._id} className="bg-white/5 border border-white/10 p-5 rounded-2xl hover:bg-white/10 transition-colors relative group">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <p className="text-red-500 font-bold text-sm">@{r.userId?.username || "Gamer"}</p>
+                    <Rate disabled defaultValue={r.rating} className="text-[10px] text-red-500" />
+                  </div>
+                  
+                  {currentUser && r.userId?._id === currentUser.userid && (
+                    <div className="flex gap-2">
+                      <Button 
+                        type="text" 
+                        icon={<EditOutlined />} 
+                        className="text-gray-400 hover:text-blue-400" 
+                        onClick={() => openEditModal(r)}
+                      />
+                      <Button 
+                        type="text" 
+                        icon={<DeleteOutlined />} 
+                        className="text-gray-400 hover:text-red-400" 
+                        onClick={() => deleteReview(r._id)}
+                      />
+                    </div>
+                  )}
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">{r.reviewText}</p>
+              </div>
+            ))
           )}
         </div>
-
       </div>
+
+      {/* ✏️ EDIT MODAL */}
+      <Modal
+        title={<span className="font-audiowide uppercase">Edit Your Review</span>}
+        open={isEditModalOpen}
+        onOk={handleUpdateReview}
+        onCancel={() => setIsEditModalOpen(false)}
+        okText="Update"
+        okButtonProps={{ danger: true, type: 'primary' }}
+        cancelButtonProps={{ className: "text-gray-400" }}
+        centered
+      >
+        <div className="space-y-4 pt-4">
+          <div>
+            <p className="text-xs uppercase text-gray-500 mb-2">Adjust Rating</p>
+            <Rate value={editRating} onChange={setEditRating} className="text-red-500" />
+          </div>
+          <div>
+            <p className="text-xs uppercase text-gray-500 mb-2">Update Thoughts</p>
+            <TextArea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              autoSize={{ minRows: 4 }}
+            />
+          </div>
+        </div>
+      </Modal>
     </main>
   );
 }

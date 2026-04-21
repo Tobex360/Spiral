@@ -52,3 +52,51 @@ exports.getReviewsByUser = async(req,res)=>{
         res.status(500).json({ message: "Error fetching user reviews" });
     }
 }
+// Update Review
+exports.updateReview = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        const { rating, reviewText } = req.body;
+
+        const review = await Review.findById(reviewId);
+        if (!review) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        if (review.userId.toString() !== req.user.userId) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
+
+        review.rating = rating;
+        review.reviewText = reviewText;
+        await review.save();
+
+        res.json(review);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Error updating review" });
+    }
+};
+
+// Delete Review
+exports.deleteReview = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+
+        const review = await Review.findById(reviewId);
+        if (!review) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        if (review.userId.toString() !== req.user.userId) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
+
+        await Review.findByIdAndDelete(reviewId);
+        res.json({ message: "Review deleted" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Error deleting review" });
+    }
+};
+
