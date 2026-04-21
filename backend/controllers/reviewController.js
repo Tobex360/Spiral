@@ -8,7 +8,7 @@ exports.createReview = async (req,res) =>{
     try{
         const { gameId, rating, reviewText }= req.body;
         const review = new Review({
-            userId: "69e6231f59b9559bcf35e0c3",
+            userId: req.user.userId,
             gameId,
             rating,
             reviewText,

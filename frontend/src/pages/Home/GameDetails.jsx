@@ -38,11 +38,21 @@ function GameDetails() {
 
   // ➕ Submit Review
   const submitReview = async () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user.token) {
+      alert('Please log in to submit a review');
+      return;
+    }
+
     try {
       await axios.post("/api/reviews", {
         gameId: Number(gameId),
         rating,
         reviewText: text,
+      }, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
       });
 
       setText("");

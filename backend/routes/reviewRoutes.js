@@ -4,8 +4,9 @@ const {
     createReview,
     getReviewsByGame
 } = require('../controllers/reviewController');
+const authenticateToken = require('../middleware/awtjwt');
 
-Router.post("/", createReview);
+Router.post("/", authenticateToken, createReview);
 
 Router.get("/:gameId", getReviewsByGame)
 

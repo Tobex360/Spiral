@@ -1,5 +1,6 @@
 const User = require('../models/user');
-const jwt = require('../middleware/awtjwt');
+const jwt = require('jsonwebtoken');
+const authenticateToken = require('../middleware/awtjwt');
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET;
@@ -45,7 +46,7 @@ async function loginUser(req,res){
         if(!isPasswordValid){
             return res.status(400).send({message: 'Incorrect Password'})
         }
-        let token = await jwt.toString({userId:user?._id},secretKey,{expiresIn:'3h'});
+        let token = jwt.sign({userId:user?._id},secretKey,{expiresIn:'3h'});
         finalData={
             userid:user?._id,
             username:user?.username,
