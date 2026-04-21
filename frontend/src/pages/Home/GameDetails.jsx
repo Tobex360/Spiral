@@ -28,7 +28,7 @@ function GameDetails() {
   // 💬 Fetch Reviews
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(`/api/reviews/${gameId}`);
+      const res = await axios.get(`/api/reviews/game/${gameId}`);
       setReviews(res.data);
     } catch (err) {
       console.error(err);

@@ -38,3 +38,17 @@ exports.getReviewsByGame = async (req, res) =>{
         res.status(500).json({ message: "Error fetching review" });
     }
 }
+
+exports.getReviewsByUser = async(req,res)=>{
+    try{
+        const { userId } = req.params;
+
+        const reviews = await Review.find({ userId })
+        .sort({ createdAt: -1 });
+
+        res.json(reviews);
+    }catch(err){
+        console.error(err);
+        res.status(500).json({ message: "Error fetching user reviews" });
+    }
+}
