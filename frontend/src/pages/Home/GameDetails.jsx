@@ -75,7 +75,7 @@ function GameDetails() {
     }
   };
 
-  // ✏️ Open Modal for Edit
+  // Open Modal for Edit
   const openEditModal = (review) => {
     setEditingReview(review);
     setEditRating(review.rating);
