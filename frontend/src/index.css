@@ -28,3 +28,16 @@ html {
 .social-icon {
   @apply text-xl text-white hover:text-primary transition-transform hover:-translate-y-1;
 }
+
+/* Empty stars */
+.ant-rate-star-zero .ant-rate-star-first,
+.ant-rate-star-zero .ant-rate-star-second {
+  color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Filled stars */
+.ant-rate-star-full .ant-rate-star-first,
+.ant-rate-star-full .ant-rate-star-second {
+  color: #ef4444 !important;
+}
+

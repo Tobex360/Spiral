@@ -12,6 +12,7 @@ function Home() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [averageRatings, setAverageRatings] = useState({})
 
   const navigate = useNavigate()
 
@@ -23,6 +24,18 @@ function Home() {
       )
       setGames(res.data.results)
       setTotal(res.data.count)
+      
+      // Fetch average ratings for each game
+      const ratingsMap = {}
+      for (const game of res.data.results) {
+        try {
+          const ratingRes = await axios.get(`/api/reviews/game/${game.id}/average-rating`)
+          ratingsMap[game.id] = ratingRes.data.averageRating
+        } catch (err) {
+          ratingsMap[game.id] = 0
+        }
+      }
+      setAverageRatings(ratingsMap)
     } catch (err) {
       console.error(err)
     } finally {
@@ -72,7 +85,7 @@ function Home() {
 
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           
-          {/* 🎮 Games Grid */}
+          {/* Games Grid */}
           {loading ? (
             <div className="flex flex-col justify-center items-center h-64 gap-4">
               <Spin size="large" />
@@ -86,6 +99,7 @@ function Home() {
                     <div 
                       key={game.id} 
                       className='group relative bg-secondary/40 border border-white/5 rounded-2xl overflow-hidden hover:border-red-500/50 transition-all duration-300 shadow-xl'
+                      onClick={()=>{navigate(`/gamedetails/${game.id}`)}}
                     >
                       {/* Image Container */}
                       <div className='relative h-48 overflow-hidden'>
@@ -97,7 +111,7 @@ function Home() {
                         />
                         <div className='absolute bottom-3 left-3 z-20 flex items-center gap-1 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md border border-white/10'>
                           <StarFilled className="text-yellow-500 text-xs" />
-                          <span className='text-xs font-bold text-yellow-500'>{game.rating}</span>
+                          <span className='text-xs font-bold text-yellow-500'>{averageRatings[game.id]?.toFixed(1) || 'N/A'}</span>
                         </div>
                       </div>
 

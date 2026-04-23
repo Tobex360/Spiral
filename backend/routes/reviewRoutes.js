@@ -7,13 +7,16 @@ const {
     updateReview,
     deleteReview,
     likeReview,
-    dislikeReview
+    dislikeReview,
+    getAverageRating
 } = require('../controllers/reviewController');
 const authenticateToken = require('../middleware/awtjwt');
 
 Router.post("/", authenticateToken, createReview);
 
 Router.get("/game/:gameId", getReviewsByGame);
+
+Router.get("/game/:gameId/average-rating", getAverageRating);
 
 Router.get("/user/:userId", getReviewsByUser);
 

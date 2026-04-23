@@ -168,3 +168,33 @@ exports.dislikeReview = async (req, res) => {
     }
 };
 
+// Get Average Rating for a Game
+exports.getAverageRating = async (req, res) => {
+    try {
+        const { gameId } = req.params;
+
+        const result = await Review.aggregate([
+            { $match: { gameId: Number(gameId) } },
+            { 
+                $group: {
+                    _id: null,
+                    averageRating: { $avg: "$rating" },
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        if (result.length === 0) {
+            return res.json({ averageRating: 0, count: 0 });
+        }
+
+        res.json({
+            averageRating: Math.round(result[0].averageRating * 10) / 10,
+            count: result[0].count
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Error fetching average rating" });
+    }
+};
+

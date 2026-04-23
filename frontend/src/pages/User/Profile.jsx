@@ -243,7 +243,7 @@ function Profile() {
                             <Button type="text" icon={<DeleteOutlined />} className='text-gray-400 hover:text-red-500' onClick={() => handleDelete(review._id)} />
                         </div>
                     </div>
-                    <Rate disabled defaultValue={review.rating} className='text-[10px] text-red-500 mb-4' />
+                    <Rate disabled value={review.rating} className='text-[10px] text-red-500 mb-4' />
                     <p className='text-gray-400 text-sm leading-relaxed mb-6 italic'>"{review.reviewText}"</p>
 
                     <div className='flex items-center gap-6 mt-auto'>

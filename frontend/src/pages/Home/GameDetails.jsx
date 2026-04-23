@@ -21,6 +21,7 @@ function GameDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [averageRating, setAverageRating] = useState(0);
 
   // Form State
   const [rating, setRating] = useState(5);
@@ -47,6 +48,16 @@ function GameDetails() {
       setReviews(res.data);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const fetchAverageRating = async () => {
+    try {
+      const res = await axios.get(`/api/reviews/game/${gameId}/average-rating`);
+      setAverageRating(res.data.averageRating);
+    } catch (err) {
+      console.error(err);
+      setAverageRating(0);
     }
   };
 
@@ -155,7 +166,7 @@ function GameDetails() {
     setCurrentUser(JSON.parse(localStorage.getItem('user')));
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchGame(), fetchReviews()]);
+      await Promise.all([fetchGame(), fetchReviews(), fetchAverageRating()]);
       setLoading(false);
     };
     loadData();
@@ -166,7 +177,7 @@ function GameDetails() {
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white pb-20">
-      {/* 🎮 HERO BANNER */}
+      {/* HERO BANNER */}
       <div className="relative h-[400px] w-full">
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-10" />
         <img src={game.background_image} alt="" className="w-full h-full object-cover opacity-40" />
@@ -174,8 +185,8 @@ function GameDetails() {
         <div className="absolute bottom-0 left-0 w-full z-20 px-6 md:px-12 pb-10 max-w-7xl mx-auto right-0">
           <h1 className="text-4xl md:text-6xl font-audiowide text-white mb-4 uppercase">{game.name}</h1>
           <div className="flex items-center gap-4">
-            <Rate disabled defaultValue={game.rating} allowHalf className="text-red-500" />
-            <span className="text-xl font-bold">{game.rating} / 5</span>
+            <Rate disabled value={averageRating} allowHalf className="text-red-500" />
+            <span className="text-xl font-bold">{averageRating.toFixed(1)} / 5</span>
           </div>
         </div>
       </div>
@@ -194,7 +205,7 @@ function GameDetails() {
             </div>
           </section>
 
-          {/* ✍️ WRITE REVIEW */}
+          {/* WRITE REVIEW */}
           <section className="bg-white/5 border border-white/10 p-6 rounded-2xl">
             <div className="flex items-center gap-2 mb-6">
               <MessageOutlined className="text-red-500" />
@@ -242,7 +253,7 @@ function GameDetails() {
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <p className="text-red-500 font-bold text-sm">@{r.userId?.username || "Gamer"}</p>
-                    <Rate disabled defaultValue={r.rating} className="text-[10px] text-red-500" />
+                    <Rate disabled value={r.rating} className="text-[10px] text-red-500" />
                   </div>
                   
                   {currentUser && r.userId?._id === currentUser.userid && (
