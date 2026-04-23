@@ -237,7 +237,7 @@ function Profile() {
 
                   <div className='flex-1 flex flex-col'>
                     <div className='flex justify-between items-start mb-2'>
-                        <h3 className='text-xl font-audiowide text-white group-hover:text-red-500 transition-colors uppercase'>{review.game?.name}</h3>
+                        <h3 className='text-xl font-audiowide text-white group-hover:text-red-500 transition-colors uppercase'><Link to={`/gamedetails/${review.gameId}`}>{review.game?.name}</Link></h3>
                         <div className='flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity'>
                             <Button type="text" icon={<EditOutlined />} className='text-gray-400 hover:text-blue-400' onClick={() => openEditModal(review)} />
                             <Button type="text" icon={<DeleteOutlined />} className='text-gray-400 hover:text-red-500' onClick={() => handleDelete(review._id)} />
