@@ -78,7 +78,7 @@ function Landing() {
         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
           From retro classics to next-gen blockbusters, we have more than 500,000 games ready for your verdict.
         </p>
-        <Btn to="/">Explore</Btn>
+        <Btn to="/home">Explore</Btn>
       </section>
 
       <Divider />
