@@ -100,3 +100,71 @@ exports.deleteReview = async (req, res) => {
     }
 };
 
+// 👍 Like Review
+exports.likeReview = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        const userId = req.user.userId;
+
+        const review = await Review.findById(reviewId);
+        if (!review) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        const hasLiked = review.likes.includes(userId);
+        const hasDisliked = review.dislikes.includes(userId);
+
+        if (hasLiked) {
+            // Remove like if already liked
+            review.likes = review.likes.filter(id => id.toString() !== userId);
+        } else {
+            // Add like and remove dislike if exists
+            review.likes.push(userId);
+            if (hasDisliked) {
+                review.dislikes = review.dislikes.filter(id => id.toString() !== userId);
+            }
+        }
+
+        await review.save();
+        const updatedReview = await review.populate("userId", "username");
+        res.json(updatedReview);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Error liking review" });
+    }
+};
+
+// 👎 Dislike Review
+exports.dislikeReview = async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        const userId = req.user.userId;
+
+        const review = await Review.findById(reviewId);
+        if (!review) {
+            return res.status(404).json({ message: "Review not found" });
+        }
+
+        const hasLiked = review.likes.includes(userId);
+        const hasDisliked = review.dislikes.includes(userId);
+
+        if (hasDisliked) {
+            // Remove dislike if already disliked
+            review.dislikes = review.dislikes.filter(id => id.toString() !== userId);
+        } else {
+            // Add dislike and remove like if exists
+            review.dislikes.push(userId);
+            if (hasLiked) {
+                review.likes = review.likes.filter(id => id.toString() !== userId);
+            }
+        }
+
+        await review.save();
+        const updatedReview = await review.populate("userId", "username");
+        res.json(updatedReview);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Error disliking review" });
+    }
+};
+

@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import UserAvatar from '../../assets/no_avatar.webp';
-import { Button, Spin, Modal, Rate, Input, message, Empty } from 'antd';
-import { EditOutlined, DeleteOutlined, UserOutlined, MessageOutlined } from '@ant-design/icons';
+import { Button, Spin, Modal, Rate, Input, message, Empty, Tooltip } from 'antd';
+import { 
+  EditOutlined, 
+  DeleteOutlined, 
+  UserOutlined, 
+  MessageOutlined, 
+  LikeFilled, 
+  DislikeFilled,
+  CalendarOutlined 
+} from '@ant-design/icons';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
@@ -50,7 +58,6 @@ function Profile() {
     }
   }, []);
 
-  // ✏️ Handle Edit
   const openEditModal = (review) => {
     setEditingReview(review);
     setEditRating(review.rating);
@@ -68,13 +75,12 @@ function Profile() {
       });
       message.success("Review updated");
       setIsEditModalOpen(false);
-      fetchReviews(user.userid); // Refresh
+      fetchReviews(user.userid);
     } catch (err) {
       message.error("Update failed");
     }
   };
 
-  // 🗑️ Handle Delete
   const handleDelete = (reviewId) => {
     Modal.confirm({
       title: 'Delete Review',
@@ -97,10 +103,10 @@ function Profile() {
   };
 
   return (
-    <main className='min-h-screen bg-[#0a0a0a] pb-20 text-white'>
+    <main className='min-h-screen bg-[#0a0a0a] pb-20 text-white font-tomorrow'>
       <div className='max-w-6xl mx-auto px-6 md:px-12 pt-16'>
         
-        {/* 🔥 Profile Header Card */}
+        {/* Profile Header Card */}
         <div className='bg-white/5 border border-white/10 rounded-3xl p-8 mb-12 flex flex-col md:flex-row items-center gap-8 backdrop-blur-sm'>
           <div className='relative group'>
             <div className='absolute -inset-1 bg-gradient-to-r from-red-500 to-blue-500 rounded-full blur opacity-25 group-hover:opacity-50 transition'></div>
@@ -115,21 +121,21 @@ function Profile() {
             <h1 className='text-4xl font-audiowide mb-2 text-white uppercase tracking-tight'>
               {user?.username || 'Gamer'}
             </h1>
-            <div className='flex flex-wrap justify-center md:justify-start gap-6 text-sm font-tomorrow text-gray-400 mb-6'>
+            <div className='flex flex-wrap justify-center md:justify-start gap-6 text-sm text-gray-400 mb-6'>
               <span><MessageOutlined className="text-red-500 mr-2" /> {reviews.length} Reviews</span>
               <span><UserOutlined className="text-blue-500 mr-2" /> Member since 2024</span>
             </div>
             <Button 
               danger 
               type="primary" 
-              className='font-bold uppercase tracking-widest px-8 rounded-full h-10'
+              className='font-bold uppercase tracking-widest px-8 rounded-full h-10 border-none'
             >
               Edit Profile
             </Button>
           </div>
         </div>
 
-        {/* 🎮 Review Section */}
+        {/* My Activity Section */}
         <section>
           <div className='flex items-center justify-between mb-8'>
             <h2 className='text-2xl font-audiowide uppercase tracking-widest'>
@@ -146,12 +152,12 @@ function Profile() {
               {reviews.map((review) => (
                 <div 
                   key={review._id} 
-                  className='bg-secondary/40 border border-white/5 p-5 rounded-2xl flex flex-col sm:flex-row gap-6 hover:border-red-500/30 transition-all group'
+                  className='bg-secondary/20 border border-white/5 p-6 rounded-2xl flex flex-col sm:flex-row gap-6 hover:bg-secondary/40 hover:border-red-500/30 transition-all group shadow-xl'
                 >
                   {/* Game Thumbnail */}
                   <Link 
                     to={`/gamedetails/${review.gameId}`}
-                    className='w-full sm:w-40 h-28 rounded-xl overflow-hidden bg-gray-900 flex-shrink-0'
+                    className='w-full sm:w-44 h-32 rounded-xl overflow-hidden bg-gray-900 flex-shrink-0 relative'
                   >
                     {review.game?.background_image ? (
                       <img
@@ -160,38 +166,70 @@ function Profile() {
                         className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
                       />
                     ) : (
-                      <div className='flex items-center justify-center h-full text-xs text-gray-600'>No Image</div>
+                      <div className='flex items-center justify-center h-full text-xs text-gray-600 uppercase'>No Image</div>
                     )}
                   </Link>
 
                   {/* Review Content */}
                   <div className='flex-1 flex flex-col justify-between'>
                     <div>
-                      <div className='flex justify-between items-start'>
-                        <h3 className='text-lg font-bold text-white group-hover:text-red-500 transition-colors'>
-                          {review.game?.name || "Loading Game..."}
+                      <div className='flex justify-between items-start mb-1'>
+                        <h3 className='text-xl font-bold text-white group-hover:text-red-500 transition-colors font-audiowide'>
+                          {review.game?.name || "Loading..."}
                         </h3>
                         
-                        {/* Action Buttons */}
-                        <div className='flex gap-2'>
-                          <Button 
-                            type="text" 
-                            icon={<EditOutlined />} 
-                            className='text-gray-500 hover:text-blue-400'
-                            onClick={() => openEditModal(review)}
-                          />
-                          <Button 
-                            type="text" 
-                            icon={<DeleteOutlined />} 
-                            className='text-gray-500 hover:text-red-500'
-                            onClick={() => handleDelete(review._id)}
-                          />
+                        <div className='flex gap-1'>
+                          <Tooltip title="Edit Review">
+                            <Button 
+                              type="text" 
+                              icon={<EditOutlined />} 
+                              className='text-gray-500 hover:text-blue-400 flex items-center justify-center'
+                              onClick={() => openEditModal(review)}
+                            />
+                          </Tooltip>
+                          <Tooltip title="Delete Review">
+                            <Button 
+                              type="text" 
+                              icon={<DeleteOutlined />} 
+                              className='text-gray-500 hover:text-red-500 flex items-center justify-center'
+                              onClick={() => handleDelete(review._id)}
+                            />
+                          </Tooltip>
                         </div>
                       </div>
-                      <Rate disabled defaultValue={review.rating} className='text-xs text-red-500 mb-2' />
-                      <p className='text-gray-400 text-sm leading-relaxed line-clamp-2'>
-                        {review.reviewText}
+                      
+                      <Rate disabled defaultValue={review.rating} className='text-xs text-red-500 mb-3' />
+                      
+                      <p className='text-gray-300 text-sm leading-relaxed line-clamp-3 mb-4'>
+                        "{review.reviewText}"
                       </p>
+
+                      {/* Updated Likes/Dislikes Section */}
+                      <div className='flex items-center gap-4 border-t border-white/5 pt-4 mt-auto'>
+                        <div className='flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20'>
+                          <LikeFilled className="text-green-500 text-xs" />
+                          <span className='text-xs font-bold text-green-500'>{review.likes?.length || 0}</span>
+                        </div>
+
+                        <div className='flex items-center gap-2 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20'>
+                          <DislikeFilled className="text-red-500 text-xs" />
+                          <span className='text-xs font-bold text-red-500'>{review.dislikes?.length || 0}</span>
+                        </div>
+                        
+                       
+                        <div className='ml-auto flex items-center gap-2 text-[10px] text-gray-500 uppercase tracking-widest font-bold'>
+                            <CalendarOutlined className="text-red-500/50" />
+                            <span>
+                            {review.createdAt 
+                                ? new Date(review.createdAt).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                })
+                                : "Recently"}
+                            </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -201,28 +239,29 @@ function Profile() {
         </section>
       </div>
 
-      {/* ✏️ EDIT MODAL */}
+      {/* EDIT MODAL */}
       <Modal
-        title={<span className='font-audiowide uppercase tracking-tighter'>Edit Review</span>}
+        title={<span className='font-audiowide uppercase text-red-500'>Update Review</span>}
         open={isEditModalOpen}
         onOk={handleUpdateReview}
         onCancel={() => setIsEditModalOpen(false)}
-        okText="Save Changes"
+        okText="Update Entry"
         centered
-        okButtonProps={{ danger: true, type: 'primary' }}
+        okButtonProps={{ danger: true, type: 'primary', className: 'font-bold uppercase h-10 px-6 rounded-lg' }}
+        cancelButtonProps={{ type: 'text', className: 'text-gray-500' }}
       >
-        <div className='space-y-4 pt-4'>
+        <div className='space-y-6 pt-4'>
           <div>
-            <p className='text-xs uppercase text-gray-500 mb-2'>Update Rating</p>
+            <p className='text-[10px] uppercase text-gray-400 font-bold mb-2 tracking-widest'>Rating Score</p>
             <Rate value={editRating} onChange={setEditRating} className='text-red-500' />
           </div>
           <div>
-            <p className='text-xs uppercase text-gray-500 mb-2'>Update Thoughts</p>
+            <p className='text-[10px] uppercase text-gray-400 font-bold mb-2 tracking-widest'>Edit Content</p>
             <TextArea
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               autoSize={{ minRows: 4 }}
-              className='bg-black/10 border-white/10'
+              className='bg-black/20 border-white/10 text-white rounded-lg hover:border-red-500 focus:border-red-500'
             />
           </div>
         </div>

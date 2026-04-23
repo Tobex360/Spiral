@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Spin, Modal, Rate, Input, message, Button, Tag } from "antd";
-import { EditOutlined, DeleteOutlined, MessageOutlined } from "@ant-design/icons";
+import { EditOutlined,
+        DeleteOutlined,
+        MessageOutlined,
+        ArrowDownOutlined,
+        ArrowUpOutlined,
+        LikeFilled, 
+        DislikeFilled } from "@ant-design/icons";
 
 const { TextArea } = Input;
 
@@ -111,6 +117,38 @@ function GameDetails() {
         }
       }
     });
+  };
+
+  //  Like Review
+  const likeReview = async (reviewId) => {
+    if (!currentUser || !currentUser.token) {
+      message.error('Please log in to like reviews');
+      return;
+    }
+    try {
+      await axios.put(`/api/reviews/${reviewId}/like`, {}, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      fetchReviews();
+    } catch (err) {
+      message.error("Failed to like review");
+    }
+  };
+
+  //  Dislike Review
+  const dislikeReview = async (reviewId) => {
+    if (!currentUser || !currentUser.token) {
+      message.error('Please log in to dislike reviews');
+      return;
+    }
+    try {
+      await axios.put(`/api/reviews/${reviewId}/dislike`, {}, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      fetchReviews();
+    } catch (err) {
+      message.error("Failed to dislike review");
+    }
   };
 
   useEffect(() => {
@@ -225,6 +263,20 @@ function GameDetails() {
                   )}
                 </div>
                 <p className="text-gray-300 text-sm leading-relaxed">{r.reviewText}</p>
+                <div className="flex gap-4 mt-4 text-sm border-t border-white/10 pt-3">
+                  <button
+                    onClick={() => likeReview(r._id)}
+                    className="text-green-400 hover:opacity-80 transition-opacity"
+                  >
+                    <LikeFilled /> {r.likes?.length || 0}
+                  </button>
+                  <button
+                    onClick={() => dislikeReview(r._id)}
+                    className="text-red-400 hover:opacity-80 transition-opacity"
+                  >
+                    <DislikeFilled /> {r.dislikes?.length || 0}
+                  </button>
+                </div>
               </div>
             ))
           )}
