@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const cloudinary = require("../config/cloudinary");
 const jwt = require('jsonwebtoken');
 const authenticateToken = require('../middleware/awtjwt');
 require('dotenv').config();
@@ -58,9 +59,27 @@ async function loginUser(req,res){
 }
 
 
+ async function uploadProfilePic(req, res){
+    console.log(req.file);
+    try{
+        const result = await cloudinary.uploader.upload(req.file.path);
+        const user = await User.findById(req.user.userId);
+
+        user.profilePic = result.secure_url;
+        await user.save();
+
+        res.json({profilePic: user.profilePic})
+    }catch(err){
+        console.error(err);
+        res.status(500).json({ message: "Upload failed" });
+    }
+};
+
+
 const AuthController = {
     registerUser,
     loginUser,
+    uploadProfilePic,
 }
 
 module.exports = AuthController;

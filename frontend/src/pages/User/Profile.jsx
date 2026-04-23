@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../../config/api';
 
 const { TextArea } = Input;
 
@@ -25,6 +26,12 @@ function Profile() {
   const [editingReview, setEditingReview] = useState(null);
   const [editRating, setEditRating] = useState(5);
   const [editText, setEditText] = useState("");
+
+  // Profile Picture Upload Modal State
+  const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [uploadingPic, setUploadingPic] = useState(false);
 
   const fetchReviews = async (userId) => {
     try {
@@ -102,6 +109,53 @@ function Profile() {
     });
   };
 
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadProfilePic = async () => {
+    if (!selectedFile) {
+      message.warning("Please select an image first");
+      return;
+    }
+
+    try {
+      setUploadingPic(true);
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+
+      const response = await axios.post("/api/user/upload-profile-pic", formData, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data.profilePic) {
+        const updatedUser = { ...user, profilePic: response.data.profilePic };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        message.success("Profile picture updated successfully!");
+        setIsProfilePicModalOpen(false);
+        setSelectedFile(null);
+        setPreviewUrl(null);
+      }
+    } catch (err) {
+      console.error(err);
+      message.error("Failed to upload profile picture");
+    } finally {
+      setUploadingPic(false);
+    }
+  };
+
   return (
     <main className='min-h-screen bg-[#0a0a0a] pb-20 text-white font-tomorrow'>
       <div className='max-w-6xl mx-auto px-6 md:px-12 pt-16'>
@@ -111,7 +165,7 @@ function Profile() {
           <div className='relative group'>
             <div className='absolute -inset-1 bg-gradient-to-r from-red-500 to-blue-500 rounded-full blur opacity-25 group-hover:opacity-50 transition'></div>
             <img 
-              src={UserAvatar} 
+              src={user?.profilePic || UserAvatar} 
               alt="Avatar" 
               className='relative w-32 h-32 rounded-full border-4 border-[#0a0a0a] object-cover'
             />
@@ -129,6 +183,7 @@ function Profile() {
               danger 
               type="primary" 
               className='font-bold uppercase tracking-widest px-8 rounded-full h-10 border-none'
+              onClick={() => setIsProfilePicModalOpen(true)}
             >
               Edit Profile
             </Button>
@@ -264,6 +319,82 @@ function Profile() {
               className='bg-black/20 border-white/10 text-white rounded-lg hover:border-red-500 focus:border-red-500'
             />
           </div>
+        </div>
+      </Modal>
+
+      {/* PROFILE PICTURE UPLOAD MODAL */}
+      <Modal
+        title={<span className='font-audiowide uppercase text-red-500'>Update Profile Picture</span>}
+        open={isProfilePicModalOpen}
+        onOk={handleUploadProfilePic}
+        onCancel={() => {
+          setIsProfilePicModalOpen(false);
+          setSelectedFile(null);
+          setPreviewUrl(null);
+        }}
+        okText="Upload Picture"
+        centered
+        confirmLoading={uploadingPic}
+        okButtonProps={{ danger: true, type: 'primary', className: 'font-bold uppercase h-10 px-6 rounded-lg' }}
+        cancelButtonProps={{ type: 'text', className: 'text-gray-500' }}
+      >
+        <div className='space-y-6 pt-4'>
+          {/* Preview Section */}
+          <div className='flex flex-col items-center gap-4'>
+            <div className='relative'>
+              <div className='absolute -inset-1 bg-gradient-to-r from-red-500 to-blue-500 rounded-full blur opacity-25'></div>
+              <img
+                src={previewUrl || user?.profilePic || UserAvatar}
+                alt="Profile Preview"
+                className='relative w-32 h-32 rounded-full border-4 border-[#0a0a0a] object-cover'
+              />
+            </div>
+            <p className='text-xs text-gray-400'>
+              {previewUrl ? 'New image preview' : 'Current profile picture'}
+            </p>
+          </div>
+
+          {/* File Input Section */}
+          <div>
+            <p className='text-[10px] uppercase text-gray-400 font-bold mb-3 tracking-widest'>Select Image</p>
+            <div className='border-2 border-dashed border-white/20 rounded-lg p-6 hover:border-red-500/50 transition-colors cursor-pointer'>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className='hidden'
+                id="profile-pic-input"
+              />
+              <label htmlFor="profile-pic-input" className='cursor-pointer flex flex-col items-center gap-2'>
+                <svg
+                  className='w-8 h-8 text-red-500'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M12 4v16m8-8H4'
+                  />
+                </svg>
+                <span className='text-sm text-gray-300'>
+                  {selectedFile ? selectedFile.name : 'Click to select image'}
+                </span>
+                <span className='text-xs text-gray-500'>PNG, JPG, GIF up to 10MB</span>
+              </label>
+            </div>
+          </div>
+
+          {/* File Info */}
+          {selectedFile && (
+            <div className='bg-white/5 border border-white/10 rounded-lg p-3'>
+              <p className='text-xs text-gray-400'>
+                <span className='text-red-500 font-bold'>Selected:</span> {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+              </p>
+            </div>
+          )}
         </div>
       </Modal>
     </main>

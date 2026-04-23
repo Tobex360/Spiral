@@ -25,7 +25,7 @@ app.get('/api/health',(req, res)=>{
 })
 
 //Routes
-app.use('/user',authRoutes);
+app.use('/api/user',authRoutes);
 app.use('/api/games',gameRoutes);
 app.use('/api/reviews', reviewRoutes);
 

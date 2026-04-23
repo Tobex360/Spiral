@@ -17,6 +17,10 @@ const userSchema = new Schema({
     email:{
         type:String
     },
+    profilePic: {
+        type: String,
+        default: "",
+    },
     password:{
         type:String,
         required:true

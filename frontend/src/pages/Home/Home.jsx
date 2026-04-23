@@ -19,7 +19,7 @@ function Home() {
     try {
       setLoading(true)
       const res = await axios.get(
-        `${API_URL}/api/games?search=${search}&page=${page}`
+        `/api/games?search=${search}&page=${page}`
       )
       setGames(res.data.results)
       setTotal(res.data.count)
