@@ -52,6 +52,10 @@ async function loginUser(req,res){
             userid:user?._id,
             username:user?.username,
             email:user?.email,
+            displayname: user?.displayname,
+            bio: user?.bio,
+            profilePic: user?.profilePic,
+            createdAt: user?.createdAt,
             token
         }
         res.send(finalData);
@@ -75,11 +79,36 @@ async function loginUser(req,res){
     }
 };
 
+async function updateUserProfile(req, res){
+    try{
+        const { displayname, bio } = req.body;
+        const user = await User.findById(req.user.userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (displayname) user.displayname = displayname;
+        if (bio !== undefined) user.bio = bio;
+
+        await user.save();
+
+        res.json({
+            displayname: user.displayname,
+            bio: user.bio,
+        });
+    }catch(err){
+        console.error(err);
+        res.status(500).json({ message: "Update failed" });
+    }
+};
+
 
 const AuthController = {
     registerUser,
     loginUser,
     uploadProfilePic,
+    updateUserProfile,
 }
 
 module.exports = AuthController;

@@ -17,6 +17,12 @@ const userSchema = new Schema({
     email:{
         type:String
     },
+    displayname:{
+        type:String
+    },
+    bio:{
+        type: String
+    },
     profilePic: {
         type: String,
         default: "",

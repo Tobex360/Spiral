@@ -13,4 +13,8 @@ router.post("/upload-profile-pic",
     upload.single("image"),
     AuthController.uploadProfilePic);
 
+router.put("/update-profile",
+    authenticateToken,
+    AuthController.updateUserProfile);
+
 module.exports = router;
