@@ -81,6 +81,7 @@ function GameDetails() {
       setRating(5);
       message.success("Review posted!");
       fetchReviews();
+      fetchAverageRating();
     } catch (err) {
       message.error("Failed to post review");
     }
@@ -105,6 +106,7 @@ function GameDetails() {
       message.success("Review updated!");
       setIsEditModalOpen(false);
       fetchReviews();
+      fetchAverageRating();
     } catch (err) {
       message.error("Update failed");
     }
@@ -123,6 +125,7 @@ function GameDetails() {
           });
           message.success("Review deleted");
           fetchReviews();
+          fetchAverageRating();
         } catch (err) {
           message.error("Delete failed");
         }
@@ -222,7 +225,7 @@ function GameDetails() {
               onChange={(e) => setText(e.target.value)}
               placeholder="What's your take on this game?"
               autoSize={{ minRows: 3 }}
-              className="bg-black/50 border-white/10 text-black rounded-lg hover:border-red-500 focus:border-red-500"
+              className="bg-black/50 border-white/10 text-white rounded-lg hover:border-red-500 focus:border-red-500 hover:text-black"
             />
 
             <Button 
@@ -253,7 +256,7 @@ function GameDetails() {
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <p className="text-red-500 font-bold text-sm">@{r.userId?.username || "Gamer"}</p>
-                    <Rate disabled value={r.rating} className="text-[10px] text-red-500" />
+                    <Rate value={r.rating} className="text-[10px] text-red-500" />
                   </div>
                   
                   {currentUser && r.userId?._id === currentUser.userid && (
@@ -294,7 +297,7 @@ function GameDetails() {
         </div>
       </div>
 
-      {/* ✏️ EDIT MODAL */}
+      {/* EDIT MODAL */}
       <Modal
         title={<span className="font-audiowide uppercase">Edit Your Review</span>}
         open={isEditModalOpen}
