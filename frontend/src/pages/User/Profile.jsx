@@ -282,7 +282,7 @@ function Profile() {
             <TextArea value={editBio} onChange={(e) => setEditBio(e.target.value)} autoSize={{ minRows: 3 }} className='rounded-xl p-4' />
           </div>
           <Button block type="dashed" className="text-gray-400 border-gray-800 h-12 rounded-xl" onClick={() => { setIsEditProfileModalOpen(false); setIsProfilePicModalOpen(true); }}>
-            Update Avatar Image
+            Change Profile Picture
           </Button>
         </div>
       </Modal>
@@ -295,7 +295,7 @@ function Profile() {
         onCancel={() => setIsProfilePicModalOpen(false)}
         centered
         confirmLoading={uploadingPic}
-        okText="Sync Avatar"
+        okText="Change Picture"
       >
         <div className='flex flex-col items-center py-4'>
             <div className='mb-8 relative'>
@@ -305,7 +305,7 @@ function Profile() {
                 <input type="file" accept="image/*" onChange={handleFileSelect} className='hidden' />
                 <div className='border-2 border-dashed border-white/10 hover:border-red-500/50 transition-colors rounded-2xl p-8 text-center'>
                     <CloudUploadOutlined className="text-3xl text-red-500 mb-2" />
-                    <p className="text-sm text-gray-400">{selectedFile ? selectedFile.name : "Drag & Drop or Click to Browse"}</p>
+                    <p className="text-sm text-gray-400">{selectedFile ? selectedFile.name : "Click to Browse"}</p>
                 </div>
             </label>
         </div>
