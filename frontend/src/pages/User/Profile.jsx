@@ -96,7 +96,7 @@ function Profile() {
 
   const handleDelete = (reviewId) => {
     Modal.confirm({
-      title: <span className="text-white font-audiowide">DELETE REVIEW</span>,
+      title: <span className="text-primary font-audiowide">DELETE REVIEW</span>,
       content: <span className="text-gray-400">This action cannot be undone. Are you sure?</span>,
       okText: 'Delete',
       okType: 'danger',

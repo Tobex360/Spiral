@@ -225,7 +225,7 @@ function GameDetails() {
               onChange={(e) => setText(e.target.value)}
               placeholder="What's your take on this game?"
               autoSize={{ minRows: 3 }}
-              className="bg-black/50 border-white/10 text-white rounded-lg hover:border-red-500 focus:border-red-500 hover:text-black"
+              className="bg-black border-white/10 text-white rounded-lg hover:border-red-500 focus:border-red-500 focus:bg-black hover:text-white hover:bg-black"
             />
 
             <Button 
@@ -233,7 +233,7 @@ function GameDetails() {
               danger 
               size="large" 
               onClick={submitReview}
-              className="mt-4 font-bold uppercase tracking-widest h-12 px-10"
+              className="mt-4 font-bold uppercase font-tomorrow tracking-widest h-12 px-10"
             >
               Post Review
             </Button>
