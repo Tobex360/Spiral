@@ -11,6 +11,7 @@ import BackToTop from './components/BackToTop'
 import Home from './pages/Home/Home'
 import Profile from './pages/User/Profile'
 import GameDetails from './pages/Home/GameDetails'
+import OtherUser from './pages/User/OtherUser'
 
 
 function App() {
@@ -26,6 +27,8 @@ function App() {
         <Route path='/home' element={<Home />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/gamedetails/:gameId' element={<GameDetails />} />
+        <Route path='/otheruser/:usersId' element={<OtherUser />} />
+
       </Routes>
       <Footer />
       <BackToTop />

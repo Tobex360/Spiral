@@ -5,7 +5,8 @@ const mongoose = require('mongoose')
 const path = require('path')
 const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require("./routes/gameRoutes");
-const reviewRoutes = require("./routes/reviewRoutes")
+const reviewRoutes = require("./routes/reviewRoutes");
+const userRoutes = require("./routes/userRoutes")
 
 require('dotenv').config();
 
@@ -28,6 +29,7 @@ app.get('/api/health',(req, res)=>{
 app.use('/api/user',authRoutes);
 app.use('/api/games',gameRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/users', userRoutes);
 
 
 //Start Server

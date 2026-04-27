@@ -9,6 +9,7 @@ import { EditOutlined,
         ArrowUpOutlined,
         LikeFilled, 
         DislikeFilled } from "@ant-design/icons";
+import { Link } from 'react-router-dom';
 
 const { TextArea } = Input;
 
@@ -255,7 +256,7 @@ function GameDetails() {
               <div key={r._id} className="bg-white/5 border border-white/10 p-5 rounded-2xl hover:bg-white/10 transition-colors relative group">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="text-red-500 font-bold text-sm">@{r.userId?.username || "Gamer"}</p>
+                    <Link to={`/otheruser/${r.userId._id}`}><p className="text-red-500 font-bold text-sm">@{r.userId?.username || "Gamer"}</p></Link>
                     <Rate value={r.rating} className="text-[10px] text-red-500" />
                   </div>
                   
