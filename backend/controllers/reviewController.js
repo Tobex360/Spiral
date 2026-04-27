@@ -104,22 +104,22 @@ exports.deleteReview = async (req, res) => {
 exports.likeReview = async (req, res) => {
     try {
         const { reviewId } = req.params;
-        const userId = req.user.userId;
+        const userId = req.user.userId.toString();
 
         const review = await Review.findById(reviewId);
         if (!review) {
             return res.status(404).json({ message: "Review not found" });
         }
 
-        const hasLiked = review.likes.includes(userId);
-        const hasDisliked = review.dislikes.includes(userId);
+        const hasLiked = review.likes.some(id => id.toString() === userId);
+        const hasDisliked = review.dislikes.some(id => id.toString() === userId);
 
         if (hasLiked) {
             // Remove like if already liked
             review.likes = review.likes.filter(id => id.toString() !== userId);
         } else {
             // Add like and remove dislike if exists
-            review.likes.push(userId);
+            review.likes.push(req.user.userId);
             if (hasDisliked) {
                 review.dislikes = review.dislikes.filter(id => id.toString() !== userId);
             }
@@ -138,22 +138,22 @@ exports.likeReview = async (req, res) => {
 exports.dislikeReview = async (req, res) => {
     try {
         const { reviewId } = req.params;
-        const userId = req.user.userId;
+        const userId = req.user.userId.toString();
 
         const review = await Review.findById(reviewId);
         if (!review) {
             return res.status(404).json({ message: "Review not found" });
         }
 
-        const hasLiked = review.likes.includes(userId);
-        const hasDisliked = review.dislikes.includes(userId);
+        const hasLiked = review.likes.some(id => id.toString() === userId);
+        const hasDisliked = review.dislikes.some(id => id.toString() === userId);
 
         if (hasDisliked) {
             // Remove dislike if already disliked
             review.dislikes = review.dislikes.filter(id => id.toString() !== userId);
         } else {
             // Add dislike and remove like if exists
-            review.dislikes.push(userId);
+            review.dislikes.push(req.user.userId);
             if (hasLiked) {
                 review.likes = review.likes.filter(id => id.toString() !== userId);
             }

@@ -23,13 +23,14 @@ function OtherUser() {
   const [ouser, setOuser] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hasRate, setHasRate] = useState(false)
 
   const [previewUrl, setPreviewUrl] = useState(null);
  
   const fetchUser = async (usersId) =>{
     try{
         setLoading(true);
-        const res = await axios.get(`/api/users/${usersId}`);
+        const res = await axios.get(`http://localhost:2001/api/users/${usersId}`);
         setOuser(res.data);
     }catch(err){
          message.error("Failed to load User");
@@ -38,10 +39,11 @@ function OtherUser() {
     }
   };
 
+
   const fetchReviews = async (usersId) => {
     try {
       setLoading(true);
-      const res = await axios.get(`/api/users/${usersId}/reviews`);
+      const res = await axios.get(`http://localhost:2001/api/users/${usersId}/reviews`);
       
       setReviews(res.data);
     } catch (err) {
@@ -51,11 +53,49 @@ function OtherUser() {
     }
   };
 
+// like Review
+const likeReview = async (reviewId) => {
+  if (!user) {
+    message.error('Please Login to Like review');
+    return;
+  }
+  console.log('Token being sent:', user.token);
+  try {
+    await axios.put(
+      `http://localhost:2001/api/reviews/${reviewId}/like`,
+      {},
+      { headers: { Authorization: `Bearer ${user.token}` } }
+    );
+    fetchReviews(usersId);
+  } catch (err) {
+    message.error("Failed to Like");
+    console.log(err);
+  }
+};
+
+// dislike Review
+const dislikeReview = async (reviewId) => {
+  if (!user) {
+    message.error('Please Login to Dislike review');
+    return;
+  }
+  try {
+    await axios.put(
+      `http://localhost:2001/api/reviews/${reviewId}/dislike`,
+      {},
+      { headers: { Authorization: `Bearer ${user.token}` } }
+    );
+    fetchReviews(usersId);
+  } catch (err) {
+    message.error("Failed to Dislike");
+  }
+};
    useEffect(() => {
     try {
         const stored = localStorage.getItem('user');
         if (stored) {
         setUser(JSON.parse(stored));
+        console.log(stored);
         }
     } catch {
         setUser(null);
@@ -68,6 +108,13 @@ function OtherUser() {
       fetchReviews(usersId);
     }
   }, [usersId]);
+
+  //check if the user has rated this review
+  const currentUserId = user?._id;
+
+
+
+
 
   // --- Handlers ---
 
@@ -125,7 +172,16 @@ function OtherUser() {
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span className='text-gray-500'>The library is empty. Go review some games!</span>} />
           ) : (
             <div className='grid gap-6'>
-              {reviews.map((review) => (
+                {reviews.map((review) =>{
+                 const liked = user && review.likes?.some(
+                    id => id.toString() === user.userid?.toString()
+                );
+
+                const disliked = user && review.dislikes?.some(
+                    id => id.toString() === user.userid?.toString()
+                );
+
+                 return(
                 <div key={review._id} className='bg-[#111] border border-white/5 p-6 rounded-3xl flex flex-col sm:flex-row gap-8 hover:bg-[#161616] hover:border-white/10 transition-all group'>
                   <Link to={`/gamedetails/${review.gameId}`} className='w-full sm:w-48 h-32 rounded-2xl overflow-hidden bg-black flex-shrink-0 relative shadow-2xl'>
                     <img src={review.game?.background_image} alt="" className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-700' />
@@ -139,15 +195,15 @@ function OtherUser() {
                     <p className='text-gray-400 text-sm leading-relaxed mb-6 italic'>"{review.reviewText}"</p>
 
                     <div className='flex items-center gap-6 mt-auto'>
-                        <div className='flex items-center gap-2 text-xs font-bold'><LikeFilled className="text-green-500" /> {review.likes?.length || 0}</div>
-                        <div className='flex items-center gap-2 text-xs font-bold'><DislikeFilled className="text-red-500" /> {review.dislikes?.length || 0}</div>
+                        <button onClick={()=>likeReview(review._id)} className='flex items-center gap-2 text-xs font-bold'><LikeFilled className={liked ? "text-green-500" : "text-gray-500"} /> {review.likes?.length || 0}</button>
+                        <button onClick={()=>dislikeReview(review._id)} className='flex items-center gap-2 text-xs font-bold'><DislikeFilled className={disliked ? "text-red-500" : "text-gray-500"} /> {review.dislikes?.length || 0}</button>
                         <div className='ml-auto flex items-center gap-2 text-[10px] text-gray-600 font-bold uppercase tracking-tighter'>
                             <CalendarOutlined /> {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'N/A'}
                         </div>
                     </div>
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </section>
