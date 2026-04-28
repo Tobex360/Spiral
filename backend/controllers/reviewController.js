@@ -17,7 +17,13 @@ exports.createReview = async (req,res) =>{
         await review.save();
         res.status(201).json(review);
     }catch(err){
-        console.log(err);
+        if (err.code === 11000){
+            return res.status(400).json({
+                message: "You have already reviewed this game",
+            });
+        }
+
+        console.error(err);
         res.status(500).json({ message: "Error creating review" });
     }
 };

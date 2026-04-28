@@ -19,6 +19,7 @@ function GameDetails() {
   // State
   const [game, setGame] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [hasReviewed, setHasReviewed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
@@ -47,6 +48,15 @@ function GameDetails() {
     try {
       const res = await axios.get(`/api/reviews/game/${gameId}`);
       setReviews(res.data);
+
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+
+      if (storedUser) {
+        const alreadyReviewed = res.data.some(
+          (r) => r.userId?._id === storedUser.userid
+        );
+        setHasReviewed(alreadyReviewed);
+      }
     } catch (err) {
       console.error(err);
     }
@@ -68,6 +78,11 @@ function GameDetails() {
       return;
     }
     if (!text.trim()) return message.warning("Please write something first!");
+
+    if (hasReviewed) {
+      return message.warning("You already reviewed this game");
+    }
+
 
     try {
       await axios.post("/api/reviews", {
@@ -222,21 +237,22 @@ function GameDetails() {
             </div>
 
             <TextArea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="What's your take on this game?"
+              value={hasReviewed ? "You have already reviewed this game" : text}
+              onChange={(e) => !hasReviewed && setText(e.target.value)}
+              readOnly={hasReviewed}
               autoSize={{ minRows: 3 }}
-              className="bg-black border-white/10 text-white rounded-lg hover:border-red-500 focus:border-red-500 focus:bg-black hover:text-white hover:bg-black"
+              className={`bg-black border-white/10 text-white rounded-lg 
+                ${hasReviewed ? "opacity-70 cursor-not-allowed hover:bg-black focus:bg-black" : "hover:border-red-500 focus:border-red-500 hover:bg-black focus:bg-black"}
+              `}
             />
-
-            <Button 
-              type="primary" 
-              danger 
-              size="large" 
+            <Button
+              type="primary"
+              danger
+              size="large"
               onClick={submitReview}
-              className="mt-4 font-bold uppercase font-tomorrow tracking-widest h-12 px-10"
+              className="mt-4 font-bold uppercase tracking-widest h-12 px-10"
             >
-              Post Review
+              {hasReviewed ? "Review Submitted" : "Post Review"}
             </Button>
           </section>
         </div>

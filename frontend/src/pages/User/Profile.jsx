@@ -228,7 +228,7 @@ function Profile() {
           </div>
 
           {loading ? (
-            <div className="py-20 text-center"><Spin size="large" /></div>
+            <div className="py-20 text-center"><Spin size="large"  /></div>
           ) : reviews.length === 0 ? (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span className='text-gray-500'>The library is empty. Go review some games!</span>} />
           ) : (

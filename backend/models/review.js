@@ -39,6 +39,8 @@ const reviewSchema = new Schema({
     timestamps: true
 });
 
+reviewSchema.index({ userId: 1, gameId: 1 }, { unique: true });
+
 
 const Review = mongoose.model("Review", reviewSchema);
 
