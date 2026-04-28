@@ -142,7 +142,7 @@ function OtherUser() {
         {/* 🎮 Activity Section */}
         <section>
           <div className='flex items-center gap-6 mb-12'>
-            <h2 className='text-3xl font-audiowide uppercase tracking-widest'>Combat <span className='text-red-500'>Logs</span></h2>
+            <h2 className='text-3xl font-audiowide uppercase tracking-widest'>{ouser?.username}'s <span className='text-red-500'>Reviews</span></h2>
             <div className="h-[2px] flex-1 bg-gradient-to-r from-red-500/50 via-white/5 to-transparent"></div>
           </div>
 

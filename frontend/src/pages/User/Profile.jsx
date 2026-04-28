@@ -9,6 +9,7 @@ import {
   LikeFilled,
   DislikeFilled,
   CalendarOutlined,
+  FireFilled,
   CloudUploadOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
@@ -166,6 +167,8 @@ function Profile() {
       setUploadingPic(false);
     }
   };
+    const totalLikesReceived = reviews.reduce((acc, curr) => acc + (curr.likes?.length || 0), 0);
+
 
   return (
     <main className='min-h-screen bg-[#050505] pb-20 text-white font-tomorrow selection:bg-red-500/30'>
@@ -204,6 +207,7 @@ function Profile() {
 
                 <div className='flex flex-wrap justify-center md:justify-start gap-8 text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-8'>
                     <div className="flex items-center gap-2"><MessageOutlined className="text-red-500" /> {reviews.length} Reviews</div>
+                    <div className="flex items-center gap-2"><FireFilled className="text-orange-500" /> Reputation {totalLikesReceived}</div>
                     <div className="flex items-center gap-2"><UserOutlined className="text-blue-500" /> Joined {user?.createdAt ? new Date(user.createdAt).getFullYear() : '2024'}</div>
                 </div>
 
