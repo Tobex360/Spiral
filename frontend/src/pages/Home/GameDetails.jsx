@@ -191,6 +191,15 @@ function GameDetails() {
     loadData();
   }, [gameId]);
 
+  const sortedReviews = [...reviews].sort((a, b) => {
+  if (!currentUser) return 0;
+
+  if (a.userId?._id === currentUser.userid) return -1;
+  if (b.userId?._id === currentUser.userid) return 1;
+
+  return 0;
+});
+
   if (loading) return <div className="flex justify-center items-center min-h-screen bg-black"><Spin size="large" /></div>;
   if (error || !game) return <div className="text-center mt-20 text-red-500">{error || "Game not found"}</div>;
 
@@ -268,48 +277,88 @@ function GameDetails() {
               <p className="text-gray-500">No reviews yet. Be the first!</p>
             </div>
           ) : (
-            reviews.map((r) => (
-              <div key={r._id} className="bg-white/5 border border-white/10 p-5 rounded-2xl hover:bg-white/10 transition-colors relative group">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <Link to={`/otheruser/${r.userId._id}`}><p className="text-red-500 font-bold text-sm">@{r.userId?.username || "Gamer"}</p></Link>
-                    <Rate value={r.rating} className="text-[10px] text-red-500" />
-                  </div>
-                  
-                  {currentUser && r.userId?._id === currentUser.userid && (
-                    <div className="flex gap-2">
-                      <Button 
-                        type="text" 
-                        icon={<EditOutlined />} 
-                        className="text-gray-400 hover:text-blue-400" 
-                        onClick={() => openEditModal(r)}
-                      />
-                      <Button 
-                        type="text" 
-                        icon={<DeleteOutlined />} 
-                        className="text-gray-400 hover:text-red-400" 
-                        onClick={() => deleteReview(r._id)}
-                      />
-                    </div>
+            sortedReviews.map((r) =>{ 
+              const isMine = currentUser && r.userId?._id === currentUser.userid;
+              
+              return (
+                <div
+                  key={r._id}
+                  className={`relative p-5 rounded-2xl transition-all duration-300 border group overflow-hidden ${
+                    isMine
+                      ? "border-red-500/40 bg-black"
+                      : "border-white/10 bg-white/5 hover:bg-white/[0.08]"
+                  }`}
+                >
+                  {/* Background Accent for 'My Review' */}
+                  {isMine && (
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 blur-[40px] -z-10" />
                   )}
+
+                  {/* HEADER: Username, Rating, and Actions */}
+                  <div className="flex justify-between items-start gap-4 mb-4">
+                    <div className="flex-1 min-w-0"> {/* min-w-0 allows truncation */}
+                      <Link to={`/otheruser/${r.userId?._id}`}>
+                        <p className={`font-bold text-sm truncate tracking-tight ${
+                          isMine ? "text-red-400" : "text-red-500 hover:text-red-400"
+                        }`}>
+                          @{r.userId?.username || "Gamer"}
+                        </p>
+                      </Link>
+                      <Rate disabled value={r.rating} className="text-[10px] text-red-500 mt-1" />
+                    </div>
+
+                    {/* Action Group */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      {isMine && (
+                        <>
+                          <Tag color="red" className="mr-1 border-none text-[9px] font-black uppercase tracking-tighter bg-red-500/20 text-red-500">
+                            You
+                          </Tag>
+                          <Button
+                            type="text"
+                            size="small"
+                            icon={<EditOutlined className="text-xs" />}
+                            className="text-gray-500 hover:text-blue-400 hover:bg-blue-400/10 border-none"
+                            onClick={() => openEditModal(r)}
+                          />
+                          <Button
+                            type="text"
+                            size="small"
+                            icon={<DeleteOutlined className="text-xs" />}
+                            className="text-gray-500 hover:text-red-400 hover:bg-red-400/10 border-none"
+                            onClick={() => deleteReview(r._id)}
+                          />
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* BODY: Review Text */}
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4 break-words italic">
+                    "{r.reviewText}"
+                  </p>
+
+                  {/* FOOTER: Interaction Stats */}
+                  <div className="flex gap-6 mt-auto border-t border-white/5 pt-4">
+                    <button
+                      onClick={() => likeReview(r._id)}
+                      className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-green-400 transition-colors"
+                    >
+                      <LikeFilled className={r.likes?.includes(currentUser?.userid) ? "text-green-500" : ""} />
+                      <span>{r.likes?.length || 0}</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => dislikeReview(r._id)}
+                      className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-red-400 transition-colors"
+                    >
+                      <DislikeFilled className={r.dislikes?.includes(currentUser?.userid) ? "text-red-500" : ""} />
+                      <span>{r.dislikes?.length || 0}</span>
+                    </button>
+                  </div>
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed">{r.reviewText}</p>
-                <div className="flex gap-4 mt-4 text-sm border-t border-white/10 pt-3">
-                  <button
-                    onClick={() => likeReview(r._id)}
-                    className="text-green-400 hover:opacity-80 transition-opacity"
-                  >
-                    <LikeFilled /> {r.likes?.length || 0}
-                  </button>
-                  <button
-                    onClick={() => dislikeReview(r._id)}
-                    className="text-red-400 hover:opacity-80 transition-opacity"
-                  >
-                    <DislikeFilled /> {r.dislikes?.length || 0}
-                  </button>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
