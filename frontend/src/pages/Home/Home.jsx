@@ -73,8 +73,8 @@ function Home() {
           
           <div className='relative z-10 flex flex-col items-center text-center px-6'>
             <img src={logo} alt="Spiral Logo" className='h-20 w-auto mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]'/>
-            <h2 className='text-primary text-4xl md:text-6xl font-audiowide tracking-tight mb-2'>
-              SPIRAL LIBRARY
+            <h2 className='text-4xl md:text-7xl font-audiowide tracking-tighter mb-4 bg-gradient-to-b from-white to-gray-500 bg-clip-text text-transparent uppercase'>
+              Spiral <span className='text-red-600'>Library</span>
             </h2>
             <p className='text-gray-400 font-tomorrow tracking-widest uppercase text-sm'>
               Discover your next digital obsession
@@ -108,19 +108,21 @@ function Home() {
                 }}
               className="w-48"
               options={[
-                { value: 'alphabetical', label: '🔤 A - Z' },
-                { value: 'popularity', label: '🔥 Popularity' },
-                { value: 'score', label: '⭐ Spiral Score' },
-                { value: 'metacritic', label: '🆕 metacritic score' },
+                { value: 'alphabetical', label: '🔤 INDEX' },
+                { value: 'popularity', label: '🔥 TRENDING' },
+                { value: 'score', label: '⭐ SPIRAL SCORE' },
+                { value: 'metacritic', label: '🆕 METACRITIC' },
               ]}
             />
           </div>
           
           {/* Games Grid */}
           {loading ? (
-            <div className="flex flex-col justify-center items-center h-64 gap-4">
-              <Spin size="large" />
-              <p className="text-gray-500 font-tomorrow animate-pulse">Syncing Database...</p>
+            <div className="flex flex-col justify-center items-center h-96 gap-6">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-red-600/20 border-t-red-600 rounded-full animate-spin"></div>
+              </div>
+              <p className="text-gray-500 font-tomorrow tracking-[0.2em] uppercase text-xs animate-pulse">Accessing Neural Link...</p>
             </div>
           ) : (
             <>

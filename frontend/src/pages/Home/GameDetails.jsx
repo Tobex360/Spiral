@@ -215,6 +215,15 @@ function GameDetails() {
           <div className="flex items-center gap-4">
             <Rate disabled value={averageRating} allowHalf className="text-red-500" />
             <span className="text-xl font-bold">{averageRating.toFixed(1)} / 5</span>
+            <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-3 py-1 rounded-md ml-5">
+              <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">
+                Metacritic
+              </span>
+              <span className="text-sm font-bold text-green-400">
+                {game.metacritic ?? 'N/A'}
+              </span>
+            </div>
+    
           </div>
         </div>
       </div>
@@ -229,7 +238,7 @@ function GameDetails() {
               {game.description_raw || "No description available."}
             </p>
             <div className="flex flex-wrap gap-2 mt-6">
-              {game.genres?.map(g => <Tag color="red" key={g.id} className="bg-secondary border-red-500/50 uppercase">{g.name}</Tag>)}
+              {game.genres?.map(g => <Tag color="red" key={g.id} className="bg-red-500/10 border-red-500/20 text-red-500 uppercase text-[10px] px-3 py-1 rounded-full font-bold">{g.name}</Tag>)}
             </div>
           </section>
 
