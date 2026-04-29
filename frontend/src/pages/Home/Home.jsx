@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import logo from '../../assets/logo.svg'
-import { Input, Spin, Pagination, Empty, ConfigProvider, theme } from 'antd'
+import { Input, Spin, Pagination, Empty, ConfigProvider, theme, Select } from 'antd'
 import { SearchOutlined, StarFilled } from '@ant-design/icons'
 import axios from 'axios'
 import { API_URL } from '../../config/api'
@@ -12,15 +12,22 @@ function Home() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
-  const [averageRatings, setAverageRatings] = useState({})
+  const [averageRatings, setAverageRatings] = useState({});
+  const [sortBy, setSortBy] = useState('popularity');
 
   const navigate = useNavigate()
 
   const fetchGames = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
+
+      let ordering = '';
+
+      if (sortBy === 'popularity') ordering = '-added';
+      if (sortBy === 'alphabetical') ordering = 'name';
+      if (sortBy === 'metacritic') ordering = '-metacritic';
       const res = await axios.get(
-        `/api/games?search=${search}&page=${page}`
+        `/api/games?search=${search}&page=${page}&ordering=${ordering}`
       )
       setGames(res.data.results)
       setTotal(res.data.count)
@@ -45,7 +52,15 @@ function Home() {
 
   useEffect(() => {
     fetchGames()
-  }, [search, page])
+  }, [search, page, sortBy])
+
+  let sortedGames = [...games];
+
+  if (sortBy === 'score') {
+    sortedGames.sort((a, b) => {
+      return (averageRatings[b.id] || 0) - (averageRatings[a.id] || 0);
+    });
+  }
 
   return (
     // Set Ant Design to Dark Mode for the pagination/input components
@@ -84,6 +99,22 @@ function Home() {
         </div>
 
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className="flex justify-end mb-6">
+            <Select
+              value={sortBy}
+                onChange={(value) => {
+                  setSortBy(value);
+                  setPage(1);
+                }}
+              className="w-48"
+              options={[
+                { value: 'alphabetical', label: '🔤 A - Z' },
+                { value: 'popularity', label: '🔥 Popularity' },
+                { value: 'score', label: '⭐ Spiral Score' },
+                { value: 'metacritic', label: '🆕 metacritic score' },
+              ]}
+            />
+          </div>
           
           {/* Games Grid */}
           {loading ? (
@@ -93,9 +124,9 @@ function Home() {
             </div>
           ) : (
             <>
-              {games.length > 0 ? (
+              {sortedGames.length > 0 ? (
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
-                  {games.map((game) => (
+                  {sortedGames.map((game) => (
                     <div 
                       key={game.id} 
                       className='group relative bg-secondary/40 border border-white/5 rounded-2xl overflow-hidden hover:border-red-500/50 transition-all duration-300 shadow-xl'
@@ -110,8 +141,23 @@ function Home() {
                           className='h-full w-full object-cover transform group-hover:scale-110 transition-transform duration-700'
                         />
                         <div className='absolute bottom-3 left-3 z-20 flex items-center gap-1 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md border border-white/10'>
-                          <StarFilled className="text-yellow-500 text-xs" />
-                          <span className='text-xs font-bold text-yellow-500'>{averageRatings[game.id]?.toFixed(1) || 'N/A'}</span>
+                          
+                          {sortBy === 'metacritic' ? (
+                            <>
+                              <span className="text-green-400 text-xs font-bold">MC</span>
+                              <span className="text-xs font-bold text-green-400">
+                                {game.metacritic ?? 'N/A'}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <StarFilled className="text-yellow-500 text-xs" />
+                              <span className='text-xs font-bold text-yellow-500'>
+                                {averageRatings[game.id]?.toFixed(1) || 'N/A'}
+                              </span>
+                            </>
+                          )}
+
                         </div>
                       </div>
 

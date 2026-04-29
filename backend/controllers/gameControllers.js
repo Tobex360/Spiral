@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 exports.getGames = async (req, res) => {
-  const { search = "", page = 1 } = req.query;
+  const { search = "", page = 1, ordering, lang, metacritic } = req.query;
 
   try {
     const response = await axios.get(
@@ -12,6 +12,9 @@ exports.getGames = async (req, res) => {
           search,
           page,
           page_size: 20,
+          ordering,
+          lang: 'en',
+          metacritic: '1,100',
         },
         timeout: 10000,
       }
