@@ -10,6 +10,7 @@ function Home() {
   const [games, setGames] = useState([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
+  const [genre, setGenre] = useState('');
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [averageRatings, setAverageRatings] = useState({});
@@ -27,8 +28,9 @@ function Home() {
       if (sortBy === 'alphabetical') ordering = 'name';
       if (sortBy === 'metacritic') ordering = '-metacritic';
       const res = await axios.get(
-        `/api/games?search=${search}&page=${page}&ordering=${ordering}`
+        `/api/games?search=${search}&page=${page}&ordering=${ordering}${genre ? `&genre=${genre}` : ''}`
       )
+      console.log("GENRE:", genre);
       setGames(res.data.results)
       setTotal(res.data.count)
       
@@ -52,7 +54,7 @@ function Home() {
 
   useEffect(() => {
     fetchGames()
-  }, [search, page, sortBy])
+  }, [search, page, sortBy, genre])
 
   let sortedGames = [...games];
 
@@ -97,24 +99,47 @@ function Home() {
             </div>
           </div>
         </div>
-
-        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-          <div className="flex justify-end mb-6">
-            <Select
-              value={sortBy}
+          {/* SORT */}
+          <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+            <div className="flex justify-end mb-6 gap-4">
+              {/* SORT */}
+              <Select
+                value={sortBy}
+                  onChange={(value) => {
+                    setSortBy(value);
+                    setPage(1);
+                  }}
+                className="w-48"
+                options={[
+                  { value: 'popularity', label: '🔥 TRENDING' },
+                  { value: 'alphabetical', label: '🔤 INDEX' },
+                  { value: 'score', label: '⭐ SPIRAL SCORE' },
+                  { value: 'metacritic', label: '🆕 METACRITIC' },
+                ]}
+              />
+              {/* GENRE FILTER */}
+              <Select
+                placeholder="🎮 Genre"
+                value={genre || undefined}
                 onChange={(value) => {
-                  setSortBy(value);
+                  setGenre(value);
                   setPage(1);
                 }}
-              className="w-48"
-              options={[
-                { value: 'alphabetical', label: '🔤 INDEX' },
-                { value: 'popularity', label: '🔥 TRENDING' },
-                { value: 'score', label: '⭐ SPIRAL SCORE' },
-                { value: 'metacritic', label: '🆕 METACRITIC' },
-              ]}
-            />
-          </div>
+                allowClear
+                className="w-48"
+                options={[
+                  { value: 'action', label: 'Action' },
+                  { value: 'adventure', label: 'Adventure' },
+                  { value: 'role-playing-games-rpg', label: 'RPG' },
+                  { value: 'shooter', label: 'Shooter' },
+                  { value: 'strategy', label: 'Strategy' },
+                  { value: 'sports', label: 'Sports' },
+                  { value: 'racing', label: 'Racing' },
+                  { value: 'puzzle', label: 'Puzzle' },
+                  { value: 'indie', label: 'Indie' },
+                ]}
+              />
+            </div>
           
           {/* Games Grid */}
           {loading ? (
