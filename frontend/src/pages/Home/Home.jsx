@@ -119,24 +119,35 @@ function Home() {
               />
               {/* GENRE FILTER */}
               <Select
-                placeholder="🎮 Genre"
+                placeholder={<span className="text-gray-400">🎮 ALL GENRES</span>}
                 value={genre || undefined}
                 onChange={(value) => {
                   setGenre(value);
                   setPage(1);
                 }}
                 allowClear
-                className="w-48"
+                className="w-56 custom-genre-select"
+                dropdownClassName="bg-[#111] border border-white/10"
                 options={[
-                  { value: 'action', label: 'Action' },
-                  { value: 'adventure', label: 'Adventure' },
+                  { value: 'action', label: 'ACTION' },
+                  { value: 'adventure', label: 'ADVENTURE' },
                   { value: 'role-playing-games-rpg', label: 'RPG' },
-                  { value: 'shooter', label: 'Shooter' },
-                  { value: 'strategy', label: 'Strategy' },
-                  { value: 'sports', label: 'Sports' },
-                  { value: 'racing', label: 'Racing' },
-                  { value: 'puzzle', label: 'Puzzle' },
-                  { value: 'indie', label: 'Indie' },
+                  { value: 'shooter', label: 'SHOOTER' },
+                  { value: 'strategy', label: 'STRATEGY' },
+                  { value: 'indie', label: 'INDIE' },
+                  { value: 'casual', label: 'CASUAL' },
+                  { value: 'simulation', label: 'SIMULATION' },
+                  { value: 'puzzle', label: 'PUZZLE' },
+                  { value: 'arcade', label: 'ARCADE' },
+                  { value: 'platformer', label: 'PLATFORMER' },
+                  { value: 'racing', label: 'RACING' },
+                  { value: 'sports', label: 'SPORTS' },
+                  { value: 'fighting', label: 'FIGHTING' },
+                  { value: 'family', label: 'FAMILY' },
+                  { value: 'board-games', label: 'BOARD' },
+                  { value: 'educational', label: 'EDUCATION' },
+                  { value: 'card', label: 'CARD' },
+                  { value: 'massively-multiplayer', label: 'MMO' },
                 ]}
               />
             </div>
