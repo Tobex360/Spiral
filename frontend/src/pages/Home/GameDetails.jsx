@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { Spin, Modal, Rate, Input, message, Button, Tag } from "antd";
 import { EditOutlined,
@@ -34,6 +34,8 @@ function GameDetails() {
   const [editingReview, setEditingReview] = useState(null);
   const [editRating, setEditRating] = useState(5);
   const [editText, setEditText] = useState("");
+
+  const navigate = useNavigate();
 
   const fetchGame = async () => {
     try {
@@ -75,6 +77,7 @@ function GameDetails() {
   const submitReview = async () => {
     if (!currentUser || !currentUser.token) {
       message.error('Please log in to submit a review');
+      navigate('/login')
       return;
     }
     if (!text.trim()) return message.warning("Please write something first!");
@@ -153,6 +156,7 @@ function GameDetails() {
   const likeReview = async (reviewId) => {
     if (!currentUser || !currentUser.token) {
       message.error('Please log in to like reviews');
+      navigate('/login')
       return;
     }
     try {
@@ -169,6 +173,7 @@ function GameDetails() {
   const dislikeReview = async (reviewId) => {
     if (!currentUser || !currentUser.token) {
       message.error('Please log in to dislike reviews');
+      navigate('/login')
       return;
     }
     try {

@@ -11,7 +11,7 @@ import {
   TrophyOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 function OtherUser() {
   const { usersId } = useParams();
@@ -19,6 +19,7 @@ function OtherUser() {
   const [ouser, setOuser] = useState(null); 
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch target user profile
   const fetchUser = async (id) => {
@@ -44,23 +45,35 @@ function OtherUser() {
   };
 
   const likeReview = async (reviewId) => {
-    if (!user) return message.warning('Please Login to Like');
+    if (!user)  {
+      message.error('Please Login to Like');
+      navigate('/login')
+
+    };
     try {
       await axios.put(`http://localhost:2001/api/reviews/${reviewId}/like`, {}, 
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       fetchReviews(usersId);
-    } catch (err) { message.error("Action failed"); }
+    } catch (err) { 
+      console.log(err)
+     }
   };
 
   const dislikeReview = async (reviewId) => {
-    if (!user) return message.warning('Please Login to Dislike');
+     if (!user)  {
+      message.error('Please Login to Like');
+      navigate('/login')
+
+    };
     try {
       await axios.put(`http://localhost:2001/api/reviews/${reviewId}/dislike`, {}, 
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       fetchReviews(usersId);
-    } catch (err) { message.error("Action failed"); }
+    } catch (err) { 
+      console.log(err);
+     }
   };
 
   useEffect(() => {
