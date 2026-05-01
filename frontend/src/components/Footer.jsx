@@ -39,9 +39,9 @@ function Footer() {
             </h4>
             <ul className="space-y-4">
               <li><Link to="/" className="footer-link">Home</Link></li>
-              <li><Link to="/" className="footer-link">Register</Link></li>
-              <li><Link to="/" className="footer-link">Login</Link></li>
-              <li><Link to="/" className="footer-link">Catalogue</Link></li>
+              <li><Link to="/register" className="footer-link">Register</Link></li>
+              <li><Link to="/login" className="footer-link">Login</Link></li>
+              <li><Link to="/home" className="footer-link">Catalogue</Link></li>
             </ul>
           </div>
 
@@ -51,9 +51,9 @@ function Footer() {
               Support
             </h4>
             <ul className="space-y-4">
-              <li><Link to="/" className="footer-link">Help Center</Link></li>
-              <li><Link to="/" className="footer-link">Terms of Service</Link></li>
-              <li><Link to="/" className="footer-link">Privacy Policy</Link></li>
+              <li><Link to="https://github.com/Tobex360" className="footer-link">Help Center</Link></li>
+              <li><Link to="https://github.com/Tobex360" className="footer-link">Terms of Service</Link></li>
+              <li><Link to="https://github.com/Tobex360" className="footer-link">Privacy Policy</Link></li>
             </ul>
           </div>
 
