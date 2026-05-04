@@ -56,21 +56,14 @@ function Navbar() {
   }
 
   const items=[
-    {
-      label: (
-        <span onClick={handleLogout}>
-          Logout
-        </span>
-      ),
-      key: '0',
-    },
+    
     {
       label: (
         <span onClick={()=>navigate('/profile')}>
           profile
         </span>
       ),
-      key: '1',
+      key: '0',
     },
     {
       label: (
@@ -78,7 +71,23 @@ function Navbar() {
           wishlist
         </span>
       ),
+      key: '1',
+    },
+    {
+      label: (
+        <span onClick={()=>navigate('/favorites')}>
+          favorites
+        </span>
+      ),
       key: '2',
+    },
+    {
+      label: (
+        <span onClick={handleLogout}>
+          Logout
+        </span>
+      ),
+      key: '3',
     },
   ]
 

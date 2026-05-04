@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Spin, Empty, Button, message, ConfigProvider, theme } from 'antd';
-import { HeartFilled, StarFilled, DeleteOutlined, RocketOutlined } from '@ant-design/icons';
+import { HeartFilled, DeleteOutlined, RocketOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function Wishlist() {
-  const [wishlist, setWishlist] = useState([]);
+function Favorites() {
+  const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
 
-  const fetchWishlist = async () => {
+  const fetchFavorites = async () => {
     if (!user?.token) {
       setLoading(false);
       return;
     }
     try {
-      const res = await axios.get('/api/wishlist/wishlists', {
+      const res = await axios.get('/api/wishlist/favorites', {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       
@@ -29,7 +29,7 @@ function Wishlist() {
           return { ...gameRes.data, wishlistId: item._id };
         })
       );
-      setWishlist(detailedGames);
+      setFavorites(detailedGames);
     } catch (err) {
       console.error(err);
       message.error("Failed to get games)");
@@ -51,14 +51,14 @@ function Wishlist() {
   };
 
   useEffect(() => {
-    fetchWishlist();
+    fetchFavorites();
   }, []);
 
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col justify-center items-center bg-[#0a0a0a] text-white p-6">
         <h2 className="text-2xl font-audiowide uppercase mb-4">Unauthorized Access</h2>
-        <p className="text-gray-500 font-tomorrow mb-8">Please log in to view your archived data.</p>
+        <p className="text-gray-500 font-tomorrow mb-8">Please log in to view your Favorites.</p>
         <Button danger type="primary" onClick={() => navigate('/login')}>Login</Button>
       </div>
     );
@@ -74,10 +74,10 @@ function Wishlist() {
             <div className="w-1 h-12 bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.8)]" />
             <div>
               <h1 className="text-4xl font-audiowide text-white uppercase tracking-tighter">
-                Archived <span className="text-red-600">Wishlist</span>
+                Your <span className="text-red-600">Favorites</span>
               </h1>
               <p className="text-gray-500 font-tomorrow text-xs uppercase tracking-[0.3em]">
-                You cant Wait to Play these games
+                You couldn't get enough of these Games
               </p>
             </div>
           </div>
@@ -85,11 +85,11 @@ function Wishlist() {
           {loading ? (
             <div className="flex flex-col justify-center items-center h-96 gap-4">
               <Spin size="large" />
-              <p className="text-gray-500 font-tomorrow text-xs animate-pulse uppercase">Decrypting Wishlist...</p>
+              <p className="text-gray-500 font-tomorrow text-xs animate-pulse uppercase">Decrypting Favorites...</p>
             </div>
-          ) : wishlist.length > 0 ? (
+          ) : favorites.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {wishlist.map((game) => (
+              {favorites.map((game) => (
                 <div 
                   key={game.id} 
                   className="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-red-500/50 transition-all duration-300"
@@ -120,7 +120,7 @@ function Wishlist() {
                     
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
-                        <StarFilled className="text-green-400 text-xs" />
+                        <HeartFilled className="text-red-600 text-xs" />
                       </div>
                       <Button 
                         size="small" 
@@ -138,7 +138,7 @@ function Wishlist() {
           ) : (
             <div className="flex flex-col items-center justify-center py-20 border border-dashed border-white/10 rounded-3xl bg-white/[0.02]">
               <Empty 
-                description={<span className="text-gray-500 font-tomorrow uppercase tracking-widest">Wishlist Empty</span>} 
+                description={<span className="text-gray-500 font-tomorrow uppercase tracking-widest">Favorites Empty</span>} 
               />
               <Button 
                 icon={<RocketOutlined />} 
@@ -155,4 +155,4 @@ function Wishlist() {
   );
 }
 
-export default Wishlist;
+export default Favorites;

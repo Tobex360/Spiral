@@ -292,20 +292,8 @@ function GameDetails() {
         
         {/* TOP RIGHT ACTIONS CORNER */}
         <div className="absolute top-6 right-6 z-30 flex flex-col gap-3">
-          <button
-            onClick={()=>toggleWishlist(gameId)}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md border shadow-lg
-              ${isWishlisted(gameId)
-                ? "bg-red-500 border-red-400 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]" 
-                : "bg-black/40 border-white/10 text-white hover:border-red-500 hover:text-red-500"
-              }
-            `}
-            title={isWishlisted(gameId) ? "Remove from Wishlist" : "Add to Wishlist"}
-          >
-            {isWishlisted(gameId) ? <StarFilled className="text-xl" /> : <StarOutlined className="text-xl" />}
-          </button>
           
-          {/* Placeholder for Favorites (Future) */}
+          
           <button
             onClick={()=>toggleFavorite(gameId)}
             className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md border shadow-lg
@@ -317,6 +305,19 @@ function GameDetails() {
             title={isFavorited(gameId) ? "Remove from Favorites" : "Add to Favorites"}
           >
             {isFavorited(gameId) ? <HeartFilled className="text-xl" /> : <HeartOutlined className="text-xl" />}
+          </button>
+          
+          <button
+            onClick={()=>toggleWishlist(gameId)}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md border shadow-lg
+              ${isWishlisted(gameId)
+                ? "bg-green-400 border-green-400 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]" 
+                : "bg-black/40 border-white/10 text-white hover:border-green-400 hover:text-green-400"
+              }
+            `}
+            title={isWishlisted(gameId) ? "Remove from Wishlist" : "Add to Wishlist"}
+          >
+            {isWishlisted(gameId) ? <StarFilled className="text-xl" /> : <StarOutlined className="text-xl" />}
           </button>
         </div>
 
