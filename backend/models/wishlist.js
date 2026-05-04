@@ -12,12 +12,17 @@ const wishlistSchema = new Schema({
         type: Number,
         required: true,
     },
+    type: {
+        type: String,
+        enum: ['wishlist', 'favorite'],
+        default: 'wishlist',
+    }
     
 },{
     timestamps:true
 });
 
-wishlistSchema.index({ userId: 1, gameId: 1 }, { unique: true });
+wishlistSchema.index({ userId: 1, gameId: 1, type: 1, }, { unique: true });
 
 const Wishlist = mongoose.model('Wishlist', wishlistSchema);
 module.exports = Wishlist;

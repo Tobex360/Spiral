@@ -10,6 +10,8 @@ import { EditOutlined,
         LikeFilled, 
         HeartFilled,
         HeartOutlined,
+        StarFilled,
+        StarOutlined,
         DislikeFilled } from "@ant-design/icons";
 import { Link } from 'react-router-dom';
 
@@ -20,7 +22,8 @@ function GameDetails() {
 
   // State
   const [game, setGame] = useState(null);
-  const [inWishlist, setInWishlist] = useState(false);
+  const [items, setItems] = useState([]);
+
   const [reviews, setReviews] = useState([]);
   const [hasReviewed, setHasReviewed] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -191,46 +194,67 @@ function GameDetails() {
 
 
   // wishlist  
-  const checkWishlist = async ()=>{
-    if(!currentUser) return;
-    try{
-      const res = await axios.get(`/api/wishlist`,{
-        headers: { Authorization: `Bearer ${currentUser.token}`},
-      });
-      const exists = res.data.some(
-        (item) => item.gameId === Number(gameId)
-      );
+  const isWishlisted = (gameId) =>
+  items.some(i => i.gameId === Number(gameId) && i.type === 'wishlist');
 
-      setInWishlist(exists)
-    }catch(err){
-      console.log(err)
+  const isFavorited = (gameId) =>
+  items.some(i => i.gameId === Number(gameId) && i.type === 'favorite');
+
+
+
+    const checkWishlist = async () => {
+    if (!currentUser) return;
+    try {
+      const res = await axios.get(`/api/wishlist`, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      setItems(res.data);
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  const toggleWishlist = async () => {
-    if(!currentUser){
-      message.error("login First")
+  const toggleWishlist = async (gameId) => {
+  if (!currentUser) { message.error("Login First"); return; }
+  try {
+    const numericId = Number(gameId);
+    const exists = isWishlisted(numericId);
+    if (exists) {
+      await axios.delete(`/api/wishlist/${numericId}?type=wishlist`, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      setItems(prev => prev.filter(i => !(i.gameId === numericId && i.type === 'wishlist')));
+    } else {
+      await axios.post(`/api/wishlist`, { gameId: numericId, type: "wishlist" }, { 
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      setItems(prev => [...prev, { gameId: numericId, type: 'wishlist' }]);
     }
-    try{
-      if(inWishlist) {
-        await axios.delete(`/api/wishlist/${gameId}`,{
-          headers: { Authorization: `Bearer ${currentUser.token}`},
-        });
-        setInWishlist(false);
-        message.success("Removed from Wishlist")
-      } else {
-        await axios.post(`/api/wishlist`,{ gameId: Number(gameId) },{
-          headers: { Authorization: `Berer ${currentUser.token}`}
-        });
-        setInWishlist(true);
-        message.success("Added to wishlist");
-      }
-    }catch(err){
-      console.log(err)
-      message.error("Action failed");
-    }
+  } catch (err) {
+    message.error("Wishlist failed");
   }
+};
 
+  const toggleFavorite = async (gameId) => {
+  if (!currentUser) { message.error("Login First"); return; }
+  try {
+    const numericId = Number(gameId);
+    const exists = isFavorited(numericId);
+    if (exists) {
+      await axios.delete(`/api/wishlist/${numericId}?type=favorite`, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      setItems(prev => prev.filter(i => !(i.gameId === numericId && i.type === 'favorite'))); 
+    } else {
+      await axios.post(`/api/wishlist`, { gameId: numericId, type: "favorite" }, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      setItems(prev => [...prev, { gameId: numericId, type: 'favorite' }]);
+    }
+  } catch (err) {
+    message.error("Favorite failed");
+  }
+};
   useEffect(() => {
     setCurrentUser(JSON.parse(localStorage.getItem('user')));
     const loadData = async () => {
@@ -269,22 +293,31 @@ function GameDetails() {
         {/* TOP RIGHT ACTIONS CORNER */}
         <div className="absolute top-6 right-6 z-30 flex flex-col gap-3">
           <button
-            onClick={toggleWishlist}
+            onClick={()=>toggleWishlist(gameId)}
             className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md border shadow-lg
-              ${inWishlist 
+              ${isWishlisted(gameId)
                 ? "bg-red-500 border-red-400 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]" 
                 : "bg-black/40 border-white/10 text-white hover:border-red-500 hover:text-red-500"
               }
             `}
-            title={inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+            title={isWishlisted(gameId) ? "Remove from Wishlist" : "Add to Wishlist"}
           >
-            {inWishlist ? <HeartFilled className="text-xl" /> : <HeartOutlined className="text-xl" />}
+            {isWishlisted(gameId) ? <StarFilled className="text-xl" /> : <StarOutlined className="text-xl" />}
           </button>
           
           {/* Placeholder for Favorites (Future) */}
-          {/* <button className="w-12 h-12 rounded-full bg-black/40 border border-white/10 text-white/40 cursor-not-allowed">
-            <StarFilled className="text-xl" />
-          </button> */}
+          <button
+            onClick={()=>toggleFavorite(gameId)}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md border shadow-lg
+              ${isFavorited(gameId)
+                ? "bg-red-500 border-red-400 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]" 
+                : "bg-black/40 border-white/10 text-white hover:border-red-500 hover:text-red-500"
+              }
+            `}
+            title={isFavorited(gameId) ? "Remove from Favorites" : "Add to Favorites"}
+          >
+            {isFavorited(gameId) ? <HeartFilled className="text-xl" /> : <HeartOutlined className="text-xl" />}
+          </button>
         </div>
 
         <div className="absolute bottom-0 left-0 w-full z-20 px-6 md:px-12 pb-10 max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between">
