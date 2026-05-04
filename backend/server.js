@@ -6,7 +6,8 @@ const path = require('path')
 const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require("./routes/gameRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
-const userRoutes = require("./routes/userRoutes")
+const userRoutes = require("./routes/userRoutes");
+const wishlistRoutes = require("./routes/wishlistRoutes");
 
 require('dotenv').config();
 
@@ -30,6 +31,7 @@ app.use('/api/user',authRoutes);
 app.use('/api/games',gameRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 
 //Start Server

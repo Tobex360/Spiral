@@ -8,6 +8,8 @@ import { EditOutlined,
         ArrowDownOutlined,
         ArrowUpOutlined,
         LikeFilled, 
+        HeartFilled,
+        HeartOutlined,
         DislikeFilled } from "@ant-design/icons";
 import { Link } from 'react-router-dom';
 
@@ -18,6 +20,7 @@ function GameDetails() {
 
   // State
   const [game, setGame] = useState(null);
+  const [inWishlist, setInWishlist] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [hasReviewed, setHasReviewed] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -186,6 +189,48 @@ function GameDetails() {
     }
   };
 
+
+  // wishlist  
+  const checkWishlist = async ()=>{
+    if(!currentUser) return;
+    try{
+      const res = await axios.get(`/api/wishlist`,{
+        headers: { Authorization: `Bearer ${currentUser.token}`},
+      });
+      const exists = res.data.some(
+        (item) => item.gameId === Number(gameId)
+      );
+
+      setInWishlist(exists)
+    }catch(err){
+      console.log(err)
+    }
+  };
+
+  const toggleWishlist = async () => {
+    if(!currentUser){
+      message.error("login First")
+    }
+    try{
+      if(inWishlist) {
+        await axios.delete(`/api/wishlist/${gameId}`,{
+          headers: { Authorization: `Bearer ${currentUser.token}`},
+        });
+        setInWishlist(false);
+        message.success("Removed from Wishlist")
+      } else {
+        await axios.post(`/api/wishlist`,{ gameId: Number(gameId) },{
+          headers: { Authorization: `Berer ${currentUser.token}`}
+        });
+        setInWishlist(true);
+        message.success("Added to wishlist");
+      }
+    }catch(err){
+      console.log(err)
+      message.error("Action failed");
+    }
+  }
+
   useEffect(() => {
     setCurrentUser(JSON.parse(localStorage.getItem('user')));
     const loadData = async () => {
@@ -195,6 +240,12 @@ function GameDetails() {
     };
     loadData();
   }, [gameId]);
+
+  useEffect(()=>{
+    if(currentUser){
+      checkWishlist();
+    }
+  },[currentUser, gameId])
 
   const sortedReviews = [...reviews].sort((a, b) => {
   if (!currentUser) return 0;
@@ -211,28 +262,53 @@ function GameDetails() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white pb-20">
       {/* HERO BANNER */}
-      <div className="relative h-[400px] w-full">
+      <div className="relative h-[400px] w-full group">
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent z-10" />
         <img src={game.background_image} alt="" className="w-full h-full object-cover opacity-40" />
         
-        <div className="absolute bottom-0 left-0 w-full z-20 px-6 md:px-12 pb-10 max-w-7xl mx-auto right-0">
-          <h1 className="text-4xl md:text-6xl font-audiowide text-white mb-4 uppercase">{game.name}</h1>
-          <div className="flex items-center gap-4">
-            <Rate disabled value={averageRating} allowHalf className="text-red-500" />
-            <span className="text-xl font-bold">{averageRating.toFixed(1)} / 5</span>
-            <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-3 py-1 rounded-md ml-5">
-              <span className="text-[10px] font-bold text-green-400 uppercase tracking-wider">
-                Metacritic
-              </span>
-              <span className="text-sm font-bold text-green-400">
-                {game.metacritic ?? 'N/A'}
-              </span>
+        {/* TOP RIGHT ACTIONS CORNER */}
+        <div className="absolute top-6 right-6 z-30 flex flex-col gap-3">
+          <button
+            onClick={toggleWishlist}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md border shadow-lg
+              ${inWishlist 
+                ? "bg-red-500 border-red-400 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]" 
+                : "bg-black/40 border-white/10 text-white hover:border-red-500 hover:text-red-500"
+              }
+            `}
+            title={inWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+          >
+            {inWishlist ? <HeartFilled className="text-xl" /> : <HeartOutlined className="text-xl" />}
+          </button>
+          
+          {/* Placeholder for Favorites (Future) */}
+          {/* <button className="w-12 h-12 rounded-full bg-black/40 border border-white/10 text-white/40 cursor-not-allowed">
+            <StarFilled className="text-xl" />
+          </button> */}
+        </div>
+
+        <div className="absolute bottom-0 left-0 w-full z-20 px-6 md:px-12 pb-10 max-w-7xl mx-auto flex flex-col md:flex-row md:items-end justify-between">
+          <div>
+            <h1 className="text-4xl md:text-6xl font-audiowide text-white mb-4 uppercase tracking-tighter">
+              {game.name}
+            </h1>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <Rate disabled value={averageRating} allowHalf className="text-red-500 text-sm" />
+                <span className="text-xl font-bold font-tomorrow">{averageRating.toFixed(1)}</span>
+              </div>
+              
+              {/* METACRITIC MINI-BADGE */}
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1 rounded-md backdrop-blur-sm">
+                <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Metacritic</span>
+                <span className={`text-sm font-bold ${game.metacritic >= 75 ? 'text-green-400' : 'text-yellow-400'}`}>
+                  {game.metacritic ?? 'N/A'}
+                </span>
+              </div>
             </div>
-    
           </div>
         </div>
       </div>
-
       <div className="max-w-7xl mx-auto px-6 md:px-12 -mt-10 relative z-30 grid lg:grid-cols-3 gap-10 pt-4">
         
         {/* LEFT: INFO & FORM */}
