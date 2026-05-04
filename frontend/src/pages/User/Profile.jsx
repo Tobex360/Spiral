@@ -213,7 +213,7 @@ function Profile() {
 
                 <Button
                     onClick={() => setIsEditProfileModalOpen(true)}
-                    className='bg-white text-black border-none font-bold uppercase tracking-widest px-10 h-12 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300 shadow-lg shadow-white/5'
+                    className='bg-secondary text-primary border-primary font-bold uppercase tracking-widest px-10 h-12 rounded-xl hover:bg-primary hover:text-secondary transition-all duration-300 shadow-lg shadow-white/5'
                 >
                     Edit Profile
                 </Button>
