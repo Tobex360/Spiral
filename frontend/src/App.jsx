@@ -12,7 +12,7 @@ import Home from './pages/Home/Home'
 import Profile from './pages/User/Profile'
 import GameDetails from './pages/Home/GameDetails'
 import OtherUser from './pages/User/OtherUser'
-
+import Wishlist from './pages/User/Wishlist'
 
 
 function App() {
@@ -27,6 +27,8 @@ function App() {
 
         <Route path='/home' element={<Home />} />
         <Route path='/profile' element={<Profile />} />
+        <Route path='/wishlist' element={<Wishlist />} />
+
         <Route path='/gamedetails/:gameId' element={<GameDetails />} />
         <Route path='/otheruser/:usersId' element={<OtherUser />} />
 

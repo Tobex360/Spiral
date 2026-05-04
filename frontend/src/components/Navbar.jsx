@@ -72,6 +72,14 @@ function Navbar() {
       ),
       key: '1',
     },
+    {
+      label: (
+        <span onClick={()=>navigate('/wishlist')}>
+          wishlist
+        </span>
+      ),
+      key: '2',
+    },
   ]
 
   // Close mobile menu when route changes
