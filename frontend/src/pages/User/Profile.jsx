@@ -21,6 +21,7 @@ function Profile() {
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [followStats, setFollowStats] = useState({ followers: 0, following: 0 });
 
   // Modals & Forms State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -60,6 +61,13 @@ function Profile() {
     }
   };
 
+  const fetchFollowStats = async (id) => {
+    try {
+      const res = await axios.get(`/api/follow/stats/${id}`);
+      setFollowStats(res.data);
+    } catch (err) { console.log(err); }
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -68,6 +76,7 @@ function Profile() {
       setEditDisplayname(parsedUser.displayname || '');
       setEditBio(parsedUser.bio || '');
       fetchReviews(parsedUser.userid);
+      fetchFollowStats(parsedUser.userid);
     }
   }, []);
 
@@ -102,7 +111,6 @@ function Profile() {
       okText: 'Delete',
       okType: 'danger',
       centered: true,
-      className: 'dark-modal',
       onOk: async () => {
         try {
           await axios.delete(`/api/reviews/${reviewId}`, {
@@ -167,63 +175,92 @@ function Profile() {
       setUploadingPic(false);
     }
   };
-    const totalLikesReceived = reviews.reduce((acc, curr) => acc + (curr.likes?.length || 0), 0);
 
+  const totalLikesReceived = reviews.reduce((acc, curr) => acc + (curr.likes?.length || 0), 0);
 
   return (
     <main className='min-h-screen bg-[#050505] pb-20 text-white font-tomorrow selection:bg-red-500/30'>
       <div className='max-w-6xl mx-auto px-6 pt-16'>
 
         {/* Profile Header Card */}
-        <div className='bg-gradient-to-br from-white/10 to-transparent border border-white/10 rounded-[2rem] p-8 mb-12 flex flex-col md:flex-row items-center gap-10 backdrop-blur-md shadow-2xl relative overflow-hidden'>
+        <div className='bg-gradient-to-br from-white/10 to-transparent border border-white/10 rounded-[2.5rem] p-8 md:p-12 mb-12 flex flex-col md:flex-row items-start gap-12 backdrop-blur-xl shadow-2xl relative overflow-hidden'>
             <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 blur-[80px] rounded-full"></div>
 
             {/* Avatar Section */}
-            <div className='relative group cursor-pointer' onClick={() => setIsProfilePicModalOpen(true)}>
+            <div className='relative group cursor-pointer shrink-0' onClick={() => setIsProfilePicModalOpen(true)}>
                 <div className='absolute -inset-1.5 bg-gradient-to-tr from-red-600 to-blue-600 rounded-full blur opacity-30 group-hover:opacity-100 transition duration-500'></div>
                 <img
                     src={user?.profilePic || UserAvatar}
                     alt="Avatar"
-                    className='relative w-36 h-36 rounded-full border-[6px] border-[#0a0a0a] object-cover bg-[#111]'
+                    className='relative w-40 h-40 rounded-full border-[6px] border-[#0a0a0a] object-cover bg-[#111]'
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                     <CloudUploadOutlined className="text-2xl text-white" />
                 </div>
             </div>
 
-            <div className='flex-1 text-center md:text-left z-10'>
-                <h1 className='text-4xl md:text-5xl font-audiowide mb-1 text-white uppercase tracking-tight'>
-                    {user?.displayname || 'Player One'}
-                </h1>
-                <p className='text-red-500 font-bold tracking-widest text-sm mb-4'>@{user?.username || 'user'}</p>
+            <div className='flex-1 text-left w-full z-10'>
+                <div className='flex items-start justify-between gap-4 mb-2'>
+                    <div>
+                      <h1 className='text-4xl md:text-5xl font-audiowide text-white uppercase leading-none'>
+                          {user?.displayname || 'Player One'}
+                      </h1>
+                      <p className='text-primary font-tomorrow text-sm mt-1'>@{user?.username || 'user'}</p>
+                    </div>
 
-                {user?.bio && (
-                    <p className='text-gray-400 max-w-xl mb-6 text-base leading-relaxed'>
-                        <span className="text-red-500/50 font-serif text-2xl leading-0 italic mr-1">"</span>
-                        {user.bio}
-                        <span className="text-red-500/50 font-serif text-2xl leading-0 italic ml-1">"</span>
-                    </p>
-                )}
-
-                <div className='flex flex-wrap justify-center md:justify-start gap-8 text-xs font-bold uppercase tracking-[0.2em] text-gray-500 mb-8'>
-                    <div className="flex items-center gap-2"><MessageOutlined className="text-red-500" /> {reviews.length} Reviews</div>
-                    <div className="flex items-center gap-2"><FireFilled className="text-orange-500" /> Reputation {totalLikesReceived}</div>
-                    <div className="flex items-center gap-2"><UserOutlined className="text-blue-500" /> Joined {user?.createdAt ? new Date(user.createdAt).getFullYear() : '2024'}</div>
+                    <button
+                        onClick={() => setIsEditProfileModalOpen(true)}
+                        className="px-6 py-2 rounded-full font-bold transition-all duration-200 text-sm bg-white text-black hover:bg-gray-200"
+                    >
+                        Edit Profile
+                    </button>
+                </div>
+                
+                {/* BIO SECTION */}
+                <div className="mt-4 mb-4">
+                  {user?.bio ? (
+                      <p className='text-gray-300 max-w-2xl text-base leading-relaxed'>
+                          {user.bio}
+                      </p>
+                  ) : (
+                      <p className='text-gray-600 italic text-sm'>No bio provided. Edit your profile to add one.</p>
+                  )}
                 </div>
 
-                <Button
-                    onClick={() => setIsEditProfileModalOpen(true)}
-                    className='bg-secondary text-primary border-primary font-bold uppercase tracking-widest px-10 h-12 rounded-xl hover:bg-primary hover:text-secondary transition-all duration-300 shadow-lg shadow-white/5'
-                >
-                    Edit Profile
-                </Button>
+                {/* SOCIAL STATS */}
+                <div className='flex items-center gap-6 mb-8 font-tomorrow'>
+                    <div className="cursor-default">
+                        <span className="font-bold text-white">{followStats.following}</span>
+                        <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Following</span>
+                    </div>
+                    <div className="cursor-default">
+                        <span className="font-bold text-white">{followStats.followers}</span>
+                        <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Followers</span>
+                    </div>
+                </div>
+
+                {/* COMPACT TECHNICAL STATS */}
+                <div className='flex flex-wrap gap-4 pt-4 border-t border-white/5'>
+                    <div className='flex items-center gap-2 px-3 py-1 bg-white/5 rounded-md border border-white/5 text-gray-400'>
+                        <MessageOutlined className='text-red-500 text-xs' />
+                        <span className='text-xs font-audiowide'>{reviews.length} <span className="text-[9px] font-tomorrow">LOGS</span></span>
+                    </div>
+                    <div className='flex items-center gap-2 px-3 py-1 bg-white/5 rounded-md border border-white/5 text-gray-400'>
+                        <FireFilled className='text-orange-500 text-xs' />
+                        <span className='text-xs font-audiowide text-white'>{totalLikesReceived} <span className="text-[9px] text-gray-500 font-tomorrow">REP</span></span>
+                    </div>
+                    <div className='flex items-center gap-2 px-3 py-1 bg-white/5 rounded-md border border-white/5 text-gray-400'>
+                        <CalendarOutlined className='text-blue-500 text-xs' />
+                        <span className='text-xs font-audiowide text-white'>{user?.createdAt ? new Date(user.createdAt).getFullYear() : '2024'}</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         {/* 🎮 Activity Section */}
         <section>
           <div className='flex items-center gap-4 mb-10'>
-            <h2 className='text-2xl font-audiowide uppercase tracking-widest'>Review <span className='text-red-500'>History</span></h2>
+            <h2 className='text-2xl font-audiowide uppercase tracking-widest'>Your Review <span className='text-red-500'>History</span></h2>
             <div className="h-px flex-1 bg-gradient-to-r from-red-500/50 to-transparent"></div>
           </div>
 
@@ -234,8 +271,10 @@ function Profile() {
           ) : (
             <div className='grid gap-6'>
               {reviews.map((review) => (
-                <div key={review._id} className='bg-[#111] border border-white/5 p-6 rounded-3xl flex flex-col sm:flex-row gap-8 hover:bg-[#161616] hover:border-white/10 transition-all group'>
-                  <Link to={`/gamedetails/${review.gameId}`} className='w-full sm:w-48 h-32 rounded-2xl overflow-hidden bg-black flex-shrink-0 relative shadow-2xl'>
+                <div key={review._id} className='bg-[#0d0d0d] border border-white/5 p-6 rounded-[2rem] flex flex-col sm:flex-row gap-8 hover:bg-[#121212] transition-all group relative overflow-hidden'>
+                  <div className='absolute -left-4 top-0 bottom-0 w-1 bg-red-500 scale-y-0 group-hover:scale-y-100 transition-transform duration-500'></div>
+                  
+                  <Link to={`/gamedetails/${review.gameId}`} className='w-full sm:w-48 h-32 rounded-2xl overflow-hidden bg-black flex-shrink-0 relative shadow-2xl ring-1 ring-white/10'>
                     <img src={review.game?.background_image} alt="" className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-700' />
                   </Link>
 
@@ -243,18 +282,22 @@ function Profile() {
                     <div className='flex justify-between items-start mb-2'>
                         <h3 className='text-xl font-audiowide text-white group-hover:text-red-500 transition-colors uppercase'><Link to={`/gamedetails/${review.gameId}`}>{review.game?.name}</Link></h3>
                         <div className='flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity'>
-                            <Button type="text" icon={<EditOutlined />} className='text-gray-400 hover:text-blue-400' onClick={() => openEditModal(review)} />
-                            <Button type="text" icon={<DeleteOutlined />} className='text-gray-400 hover:text-red-500' onClick={() => handleDelete(review._id)} />
+                            <Tooltip title="Edit Log">
+                                <Button type="text" icon={<EditOutlined />} className='text-gray-500 hover:text-blue-400' onClick={() => openEditModal(review)} />
+                            </Tooltip>
+                            <Tooltip title="Purge Record">
+                                <Button type="text" icon={<DeleteOutlined />} className='text-gray-500 hover:text-red-500' onClick={() => handleDelete(review._id)} />
+                            </Tooltip>
                         </div>
                     </div>
                     <Rate disabled value={review.rating} className='text-[10px] text-red-500 mb-4' />
-                    <p className='text-gray-400 text-sm leading-relaxed mb-6 italic'>"{review.reviewText}"</p>
+                    <p className='text-gray-400 text-sm leading-relaxed mb-6 italic opacity-80'>"{review.reviewText}"</p>
 
-                    <div className='flex items-center gap-6 mt-auto'>
-                        <div className='flex items-center gap-2 text-xs font-bold'><LikeFilled className="text-green-500" /> {review.likes?.length || 0}</div>
-                        <div className='flex items-center gap-2 text-xs font-bold'><DislikeFilled className="text-red-500" /> {review.dislikes?.length || 0}</div>
-                        <div className='ml-auto flex items-center gap-2 text-[10px] text-gray-600 font-bold uppercase tracking-tighter'>
-                            <CalendarOutlined /> {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'N/A'}
+                    <div className='flex items-center gap-6 mt-auto pt-4 border-t border-white/5'>
+                        <div className='flex items-center gap-2 text-xs font-bold text-gray-500'><LikeFilled className="text-green-500/50" /> {review.likes?.length || 0}</div>
+                        <div className='flex items-center gap-2 text-xs font-bold text-gray-500'><DislikeFilled className="text-red-500/50" /> {review.dislikes?.length || 0}</div>
+                        <div className='ml-auto flex items-center gap-2 text-[10px] text-gray-600 font-bold uppercase tracking-widest'>
+                            <CalendarOutlined className="text-red-500/30" /> {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'N/A'}
                         </div>
                     </div>
                   </div>
@@ -265,10 +308,9 @@ function Profile() {
         </section>
       </div>
 
-
       {/* Edit Profile Modal */}
       <Modal
-        title={<span className="font-audiowide text-Black uppercase">Edit Profile</span>}
+        title={<span className="font-audiowide text-black uppercase">Edit Profile</span>}
         open={isEditProfileModalOpen}
         onOk={handleUpdateUserProfile}
         onCancel={() => setIsEditProfileModalOpen(false)}
@@ -285,7 +327,7 @@ function Profile() {
             <label className='text-[10px] uppercase text-gray-500 font-black tracking-widest block mb-2'>Your Bio</label>
             <TextArea value={editBio} onChange={(e) => setEditBio(e.target.value)} autoSize={{ minRows: 3 }} className='rounded-xl p-4' />
           </div>
-          <Button block type="dashed" className="text-gray-400 border-gray-800 h-12 rounded-xl" onClick={() => { setIsEditProfileModalOpen(false); setIsProfilePicModalOpen(true); }}>
+          <Button block type="dashed" className="text-gray-400 border-gray-300 h-12 rounded-xl" onClick={() => { setIsEditProfileModalOpen(false); setIsProfilePicModalOpen(true); }}>
             Change Profile Picture
           </Button>
         </div>
@@ -315,10 +357,8 @@ function Profile() {
         </div>
       </Modal>
 
-       {/* EDIT MODAL */}
-
+       {/* EDIT REVIEW MODAL */}
       <Modal
-
         title={<span className='font-audiowide uppercase text-black'>Update Review</span>}
         open={isEditModalOpen}
         onOk={handleUpdateReview}
@@ -339,7 +379,7 @@ function Profile() {
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
               autoSize={{ minRows: 4 }}
-              className='bg-black/20 border-white/10 text-black rounded-lg hover:border-red-500 focus:border-red-500'
+              className='bg-black/5 border-white/10 rounded-lg hover:border-red-500 focus:border-red-500'
             />
           </div>
         </div>
