@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import UserAvatar from '../../assets/no_avatar.webp';
-import { Spin, Rate, message, Empty, Tooltip } from 'antd';
+import { Spin, Rate, message, Empty, Tooltip, Button } from 'antd';
 import {
   UserOutlined,
   MessageOutlined,
@@ -8,13 +8,20 @@ import {
   DislikeFilled,
   CalendarOutlined,
   FireFilled,
-  TrophyOutlined
+  TrophyOutlined,
+  UserAddOutlined,
+  UserDeleteOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 function OtherUser() {
   const { usersId } = useParams();
+  const [following, setFollowing] = useState([]);
+  const [followStats, setFollowStats] = useState({
+    followers: 0,
+    following: 0
+  });
   const [user, setUser] = useState(null);
   const [ouser, setOuser] = useState(null); 
   const [reviews, setReviews] = useState([]);
@@ -34,7 +41,6 @@ function OtherUser() {
     }
   };
 
-  // Fetch reviews for this specific user
   const fetchReviews = async (id) => {
     try {
       const res = await axios.get(`http://localhost:2001/api/users/${id}/reviews`);
@@ -45,113 +51,182 @@ function OtherUser() {
   };
 
   const likeReview = async (reviewId) => {
-    if (!user)  {
+    if (!user) {
       message.error('Please Login to Like');
-      navigate('/login')
-
-    };
+      navigate('/login');
+      return;
+    }
     try {
       await axios.put(`http://localhost:2001/api/reviews/${reviewId}/like`, {}, 
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       fetchReviews(usersId);
-    } catch (err) { 
-      console.log(err)
-     }
+    } catch (err) { console.log(err); }
   };
 
   const dislikeReview = async (reviewId) => {
-     if (!user)  {
-      message.error('Please Login to Like');
-      navigate('/login')
-
-    };
+    if (!user) {
+      message.error('Please Login to Dislike');
+      navigate('/login');
+      return;
+    }
     try {
       await axios.put(`http://localhost:2001/api/reviews/${reviewId}/dislike`, {}, 
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       fetchReviews(usersId);
-    } catch (err) { 
-      console.log(err);
-     }
+    } catch (err) { console.log(err); }
+  };
+
+  const fetchFollowing = async () => {
+    try {
+      const res = await axios.get('http://localhost:2001/api/follow/following', {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      setFollowing(res.data);
+    } catch (err) { console.error(err); }
+  };
+
+  const fetchFollowStats = async (id) => {
+    try {
+      const res = await axios.get(`http://localhost:2001/api/follow/stats/${id}`);
+      setFollowStats(res.data);
+    } catch (err) { console.log(`Error Fetching followStats ${err}`); }
+  };
+
+  const isFollowing = (id) => {
+    return following.some(f => f.following._id === id);
+  };
+
+  const toggleFollow = async (id) => {
+    if (!user) {
+      message.error("Login to follow users");
+      navigate('/login');
+      return;
+    }
+    if (user?.userid === usersId) return;
+
+    try {
+      const exists = isFollowing(id);
+      if (exists) {
+        await axios.delete(`http://localhost:2001/api/follow/${id}`, {
+          headers: { Authorization: `Bearer ${user.token}` }
+        });
+        setFollowing(prev => prev.filter(f => f.following._id !== id));
+      } else {
+        await axios.post('http://localhost:2001/api/follow', { userId: id }, {
+          headers: { Authorization: `Bearer ${user.token}` }
+        });
+        setFollowing(prev => [...prev, { following: { _id: id } }]);
+      }
+      await fetchFollowStats(usersId);
+    } catch (err) { console.error(err); }
   };
 
   useEffect(() => {
     const stored = localStorage.getItem('user');
-    if (stored) setUser(JSON.parse(stored));
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setUser(parsed);
+    }
     if (usersId) {
       fetchUser(usersId);
       fetchReviews(usersId);
+      fetchFollowStats(usersId);
     }
   }, [usersId]);
 
-  // Calculate some stats
+  useEffect(() => {
+    if (user) {
+      fetchFollowing();
+    }
+  }, [user]);
+
   const totalLikesReceived = reviews.reduce((acc, curr) => acc + (curr.likes?.length || 0), 0);
   const averageRating = reviews.length ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1) : 0;
 
   return (
     <main className='min-h-screen bg-[#050505] pb-20 text-white font-tomorrow selection:bg-red-500/30 overflow-x-hidden'>
-      {/* Decorative background glow */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-red-500/5 blur-[120px] pointer-events-none -z-10"></div>
 
       <div className='max-w-6xl mx-auto px-6 pt-16'>
 
         {/* Profile Header */}
-        <div className='bg-gradient-to-br from-white/10 to-transparent border border-white/10 rounded-[2.5rem] p-8 md:p-12 mb-12 flex flex-col md:flex-row items-center gap-12 backdrop-blur-xl shadow-2xl relative'>
-            <div className='relative shrink-0'>
-                <div className='absolute -inset-2 bg-gradient-to-tr from-red-600 via-purple-500 to-blue-600 rounded-full blur opacity-40 animate-pulse'></div>
-                <img
-                    src={ouser?.profilePic || UserAvatar}
-                    alt="Avatar"
-                    className='relative w-40 h-40 rounded-full border-8 border-[#050505] object-cover bg-[#111]'
-                />
-                <div className='absolute bottom-2 right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-[#050505]' title="Online"></div>
+<div className='bg-gradient-to-br from-white/10 to-transparent border border-white/10 rounded-[2.5rem] p-8 md:p-12 mb-12 flex flex-col md:flex-row items-start gap-12 backdrop-blur-xl shadow-2xl relative'>
+    <div className='relative shrink-0'>
+        <div className='absolute -inset-2 bg-gradient-to-tr from-red-600 via-purple-500 to-blue-600 rounded-full blur opacity-40 animate-pulse'></div>
+        <img
+            src={ouser?.profilePic || UserAvatar}
+            alt="Avatar"
+            className='relative w-40 h-40 rounded-full border-8 border-[#050505] object-cover bg-[#111]'
+        />
+    </div>
+
+    <div className='flex-1 text-left w-full'>
+        <div className='flex items-start justify-between gap-4 mb-2'>
+            <div>
+              <h1 className='text-4xl md:text-5xl font-audiowide text-white uppercase leading-none'>
+                  {ouser?.displayname || 'Soldier'}
+              </h1>
+              <p className='text-primary font-tomorrow text-sm mt-1'>@{ouser?.username}</p>
             </div>
 
-            <div className='flex-1 text-center md:text-left'>
-                <div className='flex flex-col md:flex-row md:items-center gap-4 mb-4'>
-                    <h1 className='text-4xl md:text-6xl font-audiowide text-white uppercase'>
-                        {ouser?.displayname || 'Soldier'}
-                    </h1>
-                    
-                </div>
-                
-                <p className='text-red-500 font-bold tracking-[0.3em] text-sm mb-6'>@{ouser?.username}</p>
+            {/* TWITTER-STYLE PILL BUTTON */}
+            {user?.userid !== usersId && (
+              <button
+                onClick={() => toggleFollow(usersId)}
+                className={`px-6 py-2 rounded-full font-bold transition-all duration-200 text-sm
+                  ${isFollowing(usersId) 
+                    ? "bg-transparent border border-white/20 text-white hover:border-red-500/50 hover:text-red-500 hover:bg-red-500/5" 
+                    : "bg-white text-black hover:bg-gray-200 shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                  }
+                `}
+              >
+                {isFollowing(usersId) ? "Following" : "Follow"}
+              </button>
+            )}
+        </div>
+        
+        {/* BIO SECTION */}
+        <div className="mt-4 mb-4">
+          {ouser?.bio ? (
+              <p className='text-gray-300 max-w-2xl text-base leading-relaxed font-tomorrow'>
+                  {ouser.bio}
+              </p>
+          ) : (
+              <p className='text-gray-600 italic text-sm'>No bio provided.</p>
+          )}
+        </div>
 
-                {ouser?.bio ? (
-                    <p className='text-gray-400 max-w-2xl mb-8 text-lg italic leading-relaxed opacity-80'>
-                       "{ouser.bio}"
-                    </p>
-                ) : (
-                    <p className='text-gray-600 mb-8 italic'>This operative hasn't written a bio yet.</p>
-                )}
-
-                {/* 📊 Stats Grid */}
-                <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-                    <div className='bg-white/5 p-4 rounded-2xl border border-white/5 text-center'>
-                        <MessageOutlined className='text-red-500 mb-2' />
-                        <div className='text-xl font-audiowide'>{reviews.length}</div>
-                        <div className='text-[10px] text-gray-500 uppercase font-bold tracking-widest'>Reviews</div>
-                    </div>
-                    <div className='bg-white/5 p-4 rounded-2xl border border-white/5 text-center'>
-                        <FireFilled className='text-orange-500 mb-2' />
-                        <div className='text-xl font-audiowide'>{totalLikesReceived}</div>
-                        <div className='text-[10px] text-gray-500 uppercase font-bold tracking-widest'>Reputation</div>
-                    </div>
-                    <div className='bg-white/5 p-4 rounded-2xl border border-white/5 text-center'>
-                        <TrophyOutlined className='text-yellow-500 mb-2' />
-                        <div className='text-xl font-audiowide'>{averageRating}</div>
-                        <div className='text-[10px] text-gray-500 uppercase font-bold tracking-widest'>Avg Score</div>
-                    </div>
-                    <div className='bg-white/5 p-4 rounded-2xl border border-white/5 text-center'>
-                        <CalendarOutlined className='text-blue-500 mb-2' />
-                        <div className='text-xl font-audiowide'>{ouser?.createdAt ? new Date(ouser.createdAt).getFullYear() : '2024'}</div>
-                        <div className='text-[10px] text-gray-500 uppercase font-bold tracking-widest'>Joined</div>
-                    </div>
-                </div>
+        {/* TWITTER-STYLE STATS (TEXT ONLY) */}
+        <div className='flex items-center gap-6 mb-8 font-tomorrow'>
+            <div className="cursor-pointer hover:underline decoration-red-500 transition-all">
+                <span className="font-bold text-white">{followStats.following}</span>
+                <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Following</span>
+            </div>
+            <div className="cursor-pointer hover:underline decoration-red-500 transition-all">
+                <span className="font-bold text-white">{followStats.followers}</span>
+                <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Followers</span>
             </div>
         </div>
 
+        {/* COMPACT STATS GRID (Original Stats) */}
+        <div className='flex flex-wrap gap-4 pt-4 border-t border-white/5'>
+            <div className='flex items-center gap-2 px-3 py-1 bg-white/5 rounded-md border border-white/5'>
+                <MessageOutlined className='text-red-500 text-xs' />
+                <span className='text-xs font-audiowide'>{reviews.length} <span className="text-[9px] text-gray-500 font-tomorrow">LOGS</span></span>
+            </div>
+            <div className='flex items-center gap-2 px-3 py-1 bg-white/5 rounded-md border border-white/5'>
+                <FireFilled className='text-orange-500 text-xs' />
+                <span className='text-xs font-audiowide'>{totalLikesReceived} <span className="text-[9px] text-gray-500 font-tomorrow">REP</span></span>
+            </div>
+            <div className='flex items-center gap-2 px-3 py-1 bg-white/5 rounded-md border border-white/5'>
+                <CalendarOutlined className='text-blue-500 text-xs' />
+                <span className='text-xs font-audiowide'>{ouser?.createdAt ? new Date(ouser.createdAt).getFullYear() : '2024'}</span>
+            </div>
+        </div>
+    </div>
+</div>
         {/* 🎮 Activity Section */}
         <section>
           <div className='flex items-center gap-6 mb-12'>
@@ -171,9 +246,7 @@ function OtherUser() {
 
                     return (
                         <div key={review._id} className='group relative'>
-                            {/* Glowing line on hover */}
                             <div className='absolute -left-4 top-0 bottom-0 w-1 bg-red-500 scale-y-0 group-hover:scale-y-100 transition-transform duration-500'></div>
-                            
                             <div className='bg-[#0d0d0d] border border-white/5 p-6 md:p-8 rounded-[2rem] flex flex-col md:flex-row gap-10 hover:bg-[#121212] transition-all duration-300'>
                                 <Link to={`/gamedetails/${review.gameId}`} className='shrink-0'>
                                     <div className='w-full md:w-56 h-36 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10'>
