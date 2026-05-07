@@ -50,7 +50,7 @@ exports.getFollowing = async(req, res)=>{
         const userId = req.params.userId || req.user.userId;
 
         const following = await Follow.find({ follower: userId })
-        .populate("following", "username");
+        .populate("following", "username displayname profilePic");
 
 
         res.json(following);
@@ -65,7 +65,7 @@ exports.getFollowers = async(req,res)=>{
         const userId = req.params.userId;
 
         const followers = await Follow.find({ following: userId })
-        .populate("follower","username")
+        .populate("follower","username displayname profilePic")
 
         res.json(followers)
     }catch(err){
