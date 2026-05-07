@@ -14,6 +14,7 @@ import GameDetails from './pages/Home/GameDetails'
 import OtherUser from './pages/User/OtherUser'
 import Wishlist from './pages/User/Wishlist'
 import Favorites from './pages/User/Favorites'
+import Connections from './pages/User/Connections'
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
 
         <Route path='/gamedetails/:gameId' element={<GameDetails />} />
         <Route path='/otheruser/:usersId' element={<OtherUser />} />
+        <Route path='/connection/:userId' element={<Connections />} />
 
       </Routes>
       <Footer />
