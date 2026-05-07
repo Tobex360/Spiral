@@ -78,9 +78,9 @@ function OtherUser() {
     } catch (err) { console.log(err); }
   };
 
-  const fetchFollowing = async () => {
+  const fetchFollowing = async (user) => {
     try {
-      const res = await axios.get('http://localhost:2001/api/follow/following', {
+      const res = await axios.get(`http://localhost:2001/api/follow/following/${user.userid}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setFollowing(res.data);
@@ -138,7 +138,7 @@ function OtherUser() {
 
   useEffect(() => {
     if (user) {
-      fetchFollowing();
+      fetchFollowing(user);
     }
   }, [user]);
 
@@ -198,16 +198,20 @@ function OtherUser() {
           )}
         </div>
 
-        {/* TWITTER-STYLE STATS (TEXT ONLY) */}
+        {/* STATS */}
         <div className='flex items-center gap-6 mb-8 font-tomorrow'>
-            <div className="cursor-pointer hover:underline decoration-red-500 transition-all">
-                <span className="font-bold text-white">{followStats.following}</span>
-                <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Following</span>
-            </div>
-            <div className="cursor-pointer hover:underline decoration-red-500 transition-all">
-                <span className="font-bold text-white">{followStats.followers}</span>
-                <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Followers</span>
-            </div>
+            <Link to={`/connection/${usersId}`}>
+              <div className="cursor-pointer hover:underline decoration-red-500 transition-all">
+                  <span className="font-bold text-white">{followStats.following}</span>
+                  <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Following</span>
+              </div>
+            </Link>
+            <Link to={`/connection/${usersId}`}>
+              <div className="cursor-pointer hover:underline decoration-red-500 transition-all">
+                  <span className="font-bold text-white">{followStats.followers}</span>
+                  <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Followers</span>
+              </div>
+            </Link>
         </div>
 
         {/* COMPACT STATS GRID (Original Stats) */}
