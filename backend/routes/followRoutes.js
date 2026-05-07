@@ -8,9 +8,9 @@ Router.post("/", authenticateToken, followUser);
 
 Router.delete("/:userId", authenticateToken, unfollowUser);
 
-Router.get("/following", authenticateToken, getFollowing);
+Router.get("/following/:userId", getFollowing);
 
-Router.get("/followers/:userId", authenticateToken, getFollowers);
+Router.get("/followers/:userId", getFollowers);
 
 Router.get("/stats/:userId", getFollowStats)
 
