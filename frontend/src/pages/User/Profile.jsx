@@ -229,14 +229,18 @@ function Profile() {
 
                 {/* SOCIAL STATS */}
                 <div className='flex items-center gap-6 mb-8 font-tomorrow'>
-                    <div className="cursor-default">
-                        <span className="font-bold text-white">{followStats.following}</span>
-                        <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Following</span>
-                    </div>
-                    <div className="cursor-default">
-                        <span className="font-bold text-white">{followStats.followers}</span>
-                        <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Followers</span>
-                    </div>
+                    <Link to={`/connection/${user?.userid}`}>
+                      <div className="cursor-default hover:underline">
+                          <span className="font-bold text-white">{followStats.following}</span>
+                          <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Following</span>
+                      </div>
+                    </Link>
+                    <Link to={`/connection/${user?.userid}`}>
+                      <div className="cursor-default hover:underline">
+                          <span className="font-bold text-white">{followStats.followers}</span>
+                          <span className="text-gray-500 ml-1 text-sm uppercase tracking-wider">Followers</span>
+                      </div>
+                    </Link>
                 </div>
 
                 {/* COMPACT TECHNICAL STATS */}
