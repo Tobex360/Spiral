@@ -30,4 +30,3 @@ Router.put("/:reviewId/dislike", authenticateToken, dislikeReview);
 
 module.exports = Router
 
-module.exports = Router
