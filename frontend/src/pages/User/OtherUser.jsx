@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import UserAvatar from '../../assets/no_avatar.webp';
-import { Spin, Rate, message, Empty, Tooltip, Button } from 'antd';
+import { Spin, Rate, message, Empty, Tooltip, Button, Segmented } from 'antd';
 import {
   UserOutlined,
   MessageOutlined,
@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons';
 import axios from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import PostCard from '../../components/PostCard';
 
 function OtherUser() {
   const { usersId } = useParams();
@@ -25,6 +26,8 @@ function OtherUser() {
   const [user, setUser] = useState(null);
   const [ouser, setOuser] = useState(null); 
   const [reviews, setReviews] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [activityView, setActivityView] = useState('reviews'); // 'reviews' or 'posts'
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -47,6 +50,16 @@ function OtherUser() {
       setReviews(res.data);
     } catch (err) {
       message.error("Failed to load reviews");
+    }
+  };
+
+  const fetchPosts = async (id) => {
+    try {
+      const res = await axios.get(`http://localhost:2001/api/posts/user/${id}`);
+      setPosts(res.data);
+    } catch (err) {
+      console.error('Failed to load posts:', err);
+      setPosts([]);
     }
   };
 
@@ -132,6 +145,7 @@ function OtherUser() {
     if (usersId) {
       fetchUser(usersId);
       fetchReviews(usersId);
+      fetchPosts(usersId);
       fetchFollowStats(usersId);
     }
   }, [usersId]);
@@ -233,17 +247,28 @@ function OtherUser() {
 </div>
         {/* 🎮 Activity Section */}
         <section>
-          <div className='flex items-center gap-6 mb-12'>
-            <h2 className='text-3xl font-audiowide uppercase tracking-widest'>{ouser?.username}'s <span className='text-red-500'>Reviews</span></h2>
+          <div className='flex items-center gap-6 mb-6'>
+            <h2 className='text-3xl font-audiowide uppercase tracking-widest'>{ouser?.username}'s <span className='text-red-500'>Activity</span></h2>
             <div className="h-[2px] flex-1 bg-gradient-to-r from-red-500/50 via-white/5 to-transparent"></div>
           </div>
 
+          <Segmented
+            value={activityView}
+            onChange={setActivityView}
+            options={[
+              { label: 'Reviews', value: 'reviews' },
+              { label: 'Posts', value: 'posts' },
+            ]}
+            className="w-full mb-8"
+          />
+
           {loading ? (
             <div className="py-20 text-center"><Spin size="large" /></div>
-          ) : reviews.length === 0 ? (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span className='text-gray-500'>No activity logs found for this user.</span>} />
-          ) : (
-            <div className='space-y-8'>
+          ) : activityView === 'reviews' ? (
+            reviews.length === 0 ? (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span className='text-gray-500'>No activity logs found for this user.</span>} />
+            ) : (
+              <div className='space-y-8'>
                 {reviews.map((review) => {
                     const liked = user && review.likes?.some(id => id.toString() === user.userid?.toString());
                     const disliked = user && review.dislikes?.some(id => id.toString() === user.userid?.toString());
@@ -305,6 +330,23 @@ function OtherUser() {
                     );
                 })}
             </div>
+            )
+          ) : (
+            posts.length === 0 ? (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span className='text-gray-500'>No posts yet from this user.</span>} />
+            ) : (
+              <div className='space-y-6'>
+                {posts.map((post) => (
+                  <PostCard
+                    key={post._id}
+                    post={post}
+                    currentUserId={user?.userid}
+                    onDelete={() => fetchPosts(usersId)}
+                    onUpdate={() => fetchPosts(usersId)}
+                  />
+                ))}
+              </div>
+            )
           )}
         </section>
       </div>
