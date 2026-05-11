@@ -59,9 +59,9 @@ function Connections() {
         
         {/* Header with Back Button */}
         <div className='sticky top-0 z-20 bg-[#050505]/80 backdrop-blur-md p-4 flex items-center gap-6 border-b border-white/10'>
-          <Link to={()=>navigate(-1)} className="text-white hover:text-red-500 transition-colors">
+          <div onClick={() => navigate(-1)} className="text-white hover:text-red-500 transition-colors">
             <ArrowLeftOutlined className="text-xl" />
-          </Link>
+          </div>
           <div>
             <h1 className='text-xl font-audiowide uppercase tracking-tight'>
                 {targetUser?.displayname || 'User'}
