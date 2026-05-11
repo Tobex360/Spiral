@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import UserAvatar from '../../assets/no_avatar.webp';
-import { Button, Spin, Modal, Rate, Input, message, Empty, Tooltip } from 'antd';
+import { Button, Spin, Modal, Rate, Input, message, Empty, Tooltip, Segmented } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -10,16 +10,20 @@ import {
   DislikeFilled,
   CalendarOutlined,
   FireFilled,
-  CloudUploadOutlined
+  CloudUploadOutlined,
+  PlusOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import PostCard from '../../components/PostCard';
 
 const { TextArea } = Input;
 
 function Profile() {
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [activityView, setActivityView] = useState('reviews'); // 'reviews' or 'posts'
   const [loading, setLoading] = useState(false);
   const [followStats, setFollowStats] = useState({ followers: 0, following: 0 });
 
@@ -68,6 +72,16 @@ function Profile() {
     } catch (err) { console.log(err); }
   };
 
+  const fetchPosts = async (userId) => {
+    try {
+      const res = await axios.get(`/api/posts/user/${userId}`);
+      setPosts(res.data);
+    } catch (err) {
+      console.error('Failed to fetch posts:', err);
+      setPosts([]);
+    }
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -76,6 +90,7 @@ function Profile() {
       setEditDisplayname(parsedUser.displayname || '');
       setEditBio(parsedUser.bio || '');
       fetchReviews(parsedUser.userid);
+      fetchPosts(parsedUser.userid);
       fetchFollowStats(parsedUser.userid);
     }
   }, []);
@@ -263,18 +278,29 @@ function Profile() {
 
         {/* 🎮 Activity Section */}
         <section>
-          <div className='flex items-center gap-4 mb-10'>
-            <h2 className='text-2xl font-audiowide uppercase tracking-widest'>Your Review <span className='text-red-500'>History</span></h2>
+          <div className='flex items-center gap-4 mb-6'>
+            <h2 className='text-2xl font-audiowide uppercase tracking-widest'>Your <span className='text-red-500'>Activity</span></h2>
             <div className="h-px flex-1 bg-gradient-to-r from-red-500/50 to-transparent"></div>
           </div>
 
+          <Segmented
+            value={activityView}
+            onChange={setActivityView}
+            options={[
+              { label: 'Reviews', value: 'reviews' },
+              { label: 'Posts', value: 'posts' },
+            ]}
+            className="w-full mb-6"
+          />
+
           {loading ? (
             <div className="py-20 text-center"><Spin size="large"  /></div>
-          ) : reviews.length === 0 ? (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span className='text-gray-500'>The library is empty. Go review some games!</span>} />
-          ) : (
-            <div className='grid gap-6'>
-              {reviews.map((review) => (
+          ) : activityView === 'reviews' ? (
+            reviews.length === 0 ? (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span className='text-gray-500'>The library is empty. Go review some games!</span>} />
+            ) : (
+              <div className='grid gap-6'>
+                {reviews.map((review) => (
                 <div key={review._id} className='bg-[#0d0d0d] border border-white/5 p-6 rounded-[2rem] flex flex-col sm:flex-row gap-8 hover:bg-[#121212] transition-all group relative overflow-hidden'>
                   <div className='absolute -left-4 top-0 bottom-0 w-1 bg-red-500 scale-y-0 group-hover:scale-y-100 transition-transform duration-500'></div>
                   
@@ -307,7 +333,24 @@ function Profile() {
                   </div>
                 </div>
               ))}
-            </div>
+              </div>
+            )
+          ) : (
+            posts.length === 0 ? (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span className='text-gray-500'>No posts yet. Create one to share with the community!</span>} />
+            ) : (
+              <div className='grid gap-6'>
+                {posts.map((post) => (
+                  <PostCard
+                    key={post._id}
+                    post={post}
+                    currentUserId={user?.userid}
+                    onDelete={() => fetchPosts(user?.userid)}
+                    onUpdate={() => fetchPosts(user?.userid)}
+                  />
+                ))}
+              </div>
+            )
           )}
         </section>
       </div>
@@ -388,6 +431,29 @@ function Profile() {
           </div>
         </div>
       </Modal>
+      <div className="fixed bottom-20 right-8 z-[100]">
+      <Button
+        type="primary"
+        shape="circle"
+        icon={<PlusOutlined />}
+        // onClick={scrollToTop}
+        style={{
+          backgroundColor: '#2D2926',
+          borderColor: '#2D2926',
+          width: '50px',
+          height: '50px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '20px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          opacity: 1,
+          transition: 'all 0.3s ease-in-out',
+          transform:'scale(1)',
+        }}
+        className="hover:!bg-primary hover:!border-primary hover:-translate-y-1"
+      />
+    </div>
     </main>
   );
 }
