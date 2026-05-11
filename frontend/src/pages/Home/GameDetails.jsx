@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { Spin, Modal, Rate, Input, message, Button, Tag } from "antd";
+import { Spin, Modal, Rate, Input, message, Button, Tag, Segmented } from "antd";
 import { EditOutlined,
         DeleteOutlined,
         MessageOutlined,
@@ -14,6 +14,7 @@ import { EditOutlined,
         StarOutlined,
         DislikeFilled } from "@ant-design/icons";
 import { Link } from 'react-router-dom';
+import PostCard from "../../components/PostCard";
 
 const { TextArea } = Input;
 
@@ -25,6 +26,8 @@ function GameDetails() {
   const [items, setItems] = useState([]);
 
   const [reviews, setReviews] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [activityView, setActivityView] = useState('reviews'); // 'reviews' or 'posts'
   const [hasReviewed, setHasReviewed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -77,6 +80,16 @@ function GameDetails() {
     } catch (err) {
       console.error(err);
       setAverageRating(0);
+    }
+  };
+
+  const fetchPosts = async () => {
+    try {
+      const res = await axios.get(`/api/posts/game/${gameId}`);
+      setPosts(res.data);
+    } catch (err) {
+      console.error('Failed to fetch posts:', err);
+      setPosts([]);
     }
   };
 
@@ -259,7 +272,7 @@ function GameDetails() {
     setCurrentUser(JSON.parse(localStorage.getItem('user')));
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchGame(), fetchReviews(), fetchAverageRating()]);
+      await Promise.all([fetchGame(), fetchReviews(), fetchAverageRating(), fetchPosts()]);
       setLoading(false);
     };
     loadData();
@@ -343,6 +356,8 @@ function GameDetails() {
           </div>
         </div>
       </div>
+
+      
       <div className="max-w-7xl mx-auto px-6 md:px-12 -mt-10 relative z-30 grid lg:grid-cols-3 gap-10 pt-4">
         
         {/* LEFT: INFO & FORM */}
@@ -390,22 +405,35 @@ function GameDetails() {
           </section>
         </div>
 
-        {/* RIGHT: REVIEWS LIST */}
+        {/* RIGHT: REVIEWS/POSTS FEED */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-audiowide uppercase flex items-center gap-3">
-            Community <span className="text-red-500">Feed</span>
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-audiowide uppercase flex items-center gap-3">
+              Community <span className="text-red-500">Feed</span>
+            </h2>
+          </div>
 
-          {reviews.length === 0 ? (
-            <div className="p-10 text-center bg-white/5 rounded-2xl border border-dashed border-white/20">
-              <p className="text-gray-500">No reviews yet. Be the first!</p>
-            </div>
-          ) : (
-            sortedReviews.map((r) =>{ 
-              const isMine = currentUser && r.userId?._id === currentUser.userid;
-              
-              return (
-                <div
+          <Segmented
+            value={activityView}
+            onChange={setActivityView}
+            options={[
+              { label: '💬 Reviews', value: 'reviews' },
+              { label: '📝 Posts', value: 'posts' },
+            ]}
+            className="w-full"
+          />
+
+          {activityView === 'reviews' ? (
+            reviews.length === 0 ? (
+              <div className="p-10 text-center bg-white/5 rounded-2xl border border-dashed border-white/20">
+                <p className="text-gray-500">No reviews yet. Be the first!</p>
+              </div>
+            ) : (
+              sortedReviews.map((r) =>{ 
+                const isMine = currentUser && r.userId?._id === currentUser.userid;
+                
+                return (
+                  <div
                   key={r._id}
                   className={`relative p-5 rounded-2xl transition-all duration-300 border group overflow-hidden ${
                     isMine
@@ -483,6 +511,25 @@ function GameDetails() {
                 </div>
               );
             })
+          )
+          ) : (
+            posts.length === 0 ? (
+              <div className="p-10 text-center bg-white/5 rounded-2xl border border-dashed border-white/20">
+                <p className="text-gray-500">No posts yet. Be the first!</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {posts.map((post) => (
+                  <PostCard
+                    key={post._id}
+                    post={post}
+                    currentUserId={currentUser?.userid}
+                    onDelete={() => fetchPosts()}
+                    onUpdate={() => fetchPosts()}
+                  />
+                ))}
+              </div>
+            )
           )}
         </div>
       </div>
