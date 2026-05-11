@@ -431,29 +431,6 @@ function Profile() {
           </div>
         </div>
       </Modal>
-      <div className="fixed bottom-20 right-8 z-[100]">
-      <Button
-        type="primary"
-        shape="circle"
-        icon={<PlusOutlined />}
-        // onClick={scrollToTop}
-        style={{
-          backgroundColor: '#2D2926',
-          borderColor: '#2D2926',
-          width: '50px',
-          height: '50px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '20px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          opacity: 1,
-          transition: 'all 0.3s ease-in-out',
-          transform:'scale(1)',
-        }}
-        className="hover:!bg-primary hover:!border-primary hover:-translate-y-1"
-      />
-    </div>
     </main>
   );
 }
