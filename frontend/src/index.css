@@ -41,3 +41,29 @@ html {
   color: #ef4444 !important;
 }
 
+/* Custom styling for the dropdown results */
+.cyberpunk-dropdown {
+  background-color: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+}
+
+.cyberpunk-dropdown .ant-select-item-option-active {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+.cyberpunk-select .ant-select-selector {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  color: white !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Fix for modal text visibility */
+.ant-modal-close {
+  color: rgba(255,255,255,0.5) !important;
+}
+
