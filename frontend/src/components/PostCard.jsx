@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Tooltip, message, Avatar, Modal } from 'antd';
+import { Button, Tooltip, message, Avatar, Modal, Input } from 'antd';
 import { 
   EditOutlined, 
   DeleteOutlined, 
   LikeFilled, 
   DislikeFilled, 
   CalendarOutlined,
-  UserOutlined
+  UserOutlined,
+  MessageOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { API_URL } from '../config/api';
+const { TextArea } = Input;
 
 function PostCard({ post, onUpdate, onDelete, currentUserId }) {
   const [likes, setLikes] = useState(post.likes?.length || 0);
@@ -18,6 +20,12 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
   const [userLiked, setUserLiked] = useState(post.likes?.includes(currentUserId) || false);
   const [userDisliked, setUserDisliked] = useState(post.dislikes?.includes(currentUserId) || false);
   const [gameName, setGameName] = useState(post.gameName || null);
+
+  //comment states 
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState('');
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   useEffect(() => {
     if (post.gameId && !gameName) {
@@ -103,6 +111,83 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
     }
   };
 
+  //comments
+  const fetchComments = async ()=>{
+    try{
+      setLoadingComments(true)
+      const user = JSON.parse(localStorage.getItem('user'));
+
+
+      const res = await axios.get(`${API_URL}/comments/${post._id}`,{
+        headers:{
+          Authorization: `Bearer ${user.token}`
+        }
+      });
+      setComments(res.data);
+    }catch(err){
+      console.log(err)
+      message.error("FAiled to fetch comments")
+    }finally{
+      setLoadingComments(false)
+    }
+  };
+
+  const handleCreateComment = async() => {
+    try{
+      const user = JSON.parse(localStorage.getItem('user'));
+
+      if(!user){
+        return message.error("LOGIN REQUIRED");
+      }
+      if(!commentText.trim()){
+        return message.error("comment empty")
+      }
+
+      const res = await axios.post(`${API_URL}/comments/${post._id}`,
+        { text: commentText },
+        { headers: {
+          Authorization: `Bearer ${user.token}`
+        }}
+      );
+
+      setComments(prev=> [res.data, ...prev]);
+      setCommentText('');
+
+    }catch(err){
+      console.log(err);
+      message.error("Failed to Comment")
+    }
+  };
+
+  const handleDeleteComment = async(commentId)=>{
+    try{
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      await axios.delete(`${API_URL}/comments/${commentId}`,{
+        headers:{
+          Authorization: `Bearer ${user.token}`
+        }
+      });
+
+      setComments(prev=> 
+        prev.filter(comment => comment._id == commentId)
+      );
+      fetchComments();
+
+      message.success("Comment deleted")
+    }catch(err){
+      console.log(err);
+      message.error("Delete Failed")
+    }
+  };
+
+  useEffect(()=>{
+    if(showComments){
+      fetchComments();
+    }
+  },[showComments])
+
+  
   return (
     <div className="bg-[#0d0d0d] border border-white/5 p-5 rounded-[1.5rem] flex flex-col gap-4 hover:bg-[#111111] transition-all group relative overflow-hidden shadow-xl">
       {/* Visual Identity Strip */}
@@ -172,6 +257,95 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
         </div>
       )}
 
+
+      {/* COMMENTS SECTION */}
+      {showComments && (
+        <div className="border-t border-white/5 pt-6 mt-2 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+          
+          {/* COMMENT INPUT BOX */}
+          <div className="flex gap-3 items-start bg-white/[0.03] p-3 rounded-2xl border border-white/5">
+            <Avatar 
+              src={JSON.parse(localStorage.getItem('user'))?.profilePic} 
+              size="small" 
+              icon={<UserOutlined />} 
+              className="mt-1 flex-shrink-0"
+            />
+            <div className="flex-1 flex flex-col gap-2">
+              <TextArea
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Add Comment..."
+                autoSize={{ minRows: 1, maxRows: 4 }}
+                className="bg-transparent border-none text-white text-sm placeholder:text-gray-600 focus:ring-0 hover:bg-transparent focus:bg-transparent resize-none p-0 custom-scrollbar"
+              />
+              <div className="flex justify-end">
+                <Button
+                  type="primary"
+                  danger
+                  size="small"
+                  onClick={handleCreateComment}
+                  className="font-audiowide uppercase text-[10px] tracking-widest h-8 px-4 rounded-lg"
+                >
+                  Comment
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* COMMENTS LIST */}
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            {loadingComments ? (
+              <div className="text-center py-4 text-gray-600 font-tomorrow text-xs animate-pulse">RETRIEVING Comments...</div>
+            ) : comments.length === 0 ? (
+              <div className="text-center py-4 text-gray-600 font-tomorrow text-xs italic">NO COMMENTS</div>
+            ) : (
+              comments.map(comment => (
+                <div
+                  key={comment._id}
+                  className="group/comment flex gap-3 animate-in fade-in duration-500"
+                >
+                  <Avatar
+                    src={comment.user?.profilePic}
+                    size="small"
+                    icon={<UserOutlined />}
+                    className="flex-shrink-0 border border-white/5"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="bg-white/[0.03] rounded-2xl rounded-tl-none p-3 border border-white/5 relative">
+                      <div className="flex justify-between items-baseline mb-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-xs font-audiowide text-red-500 uppercase">
+                            {comment.user?.displayname || comment.user?.username}
+                          </span>
+                          <span className="text-[9px] text-gray-600 font-tomorrow uppercase">
+                            @{comment.user?.username}
+                          </span>
+                        </div>
+                        
+                        {currentUserId === comment.user?._id && (
+                          <Button
+                            type="text"
+                            danger
+                            size="small"
+                            icon={<DeleteOutlined className="text-[10px]" />}
+                            className="opacity-0 group-hover/comment:opacity-100 transition-opacity h-auto p-0"
+                            onClick={() => handleDeleteComment(comment._id)}
+                          />
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-300 leading-relaxed font-tomorrow break-words">
+                        {comment.text}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+
       {/* Footer: Metrics & Timestamp */}
       <div className="flex items-center gap-6 mt-2 pt-4 border-t border-white/5">
         <div className="flex items-center gap-4">
@@ -193,6 +367,18 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
               <DislikeFilled />
             </div>
             <span className="font-tomorrow">{dislikes}</span>
+          </button>
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-blue-400 transition-all"
+          >
+            <div className="p-1.5 rounded-lg bg-white/5">
+              <MessageOutlined />
+            </div>
+
+            <span className="font-tomorrow">
+              {comments.length}
+            </span>
           </button>
         </div>
 
