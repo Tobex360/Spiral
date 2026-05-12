@@ -312,10 +312,10 @@ function Profile() {
                     <div className='flex justify-between items-start mb-2'>
                         <h3 className='text-xl font-audiowide text-white group-hover:text-red-500 transition-colors uppercase'><Link to={`/gamedetails/${review.gameId}`}>{review.game?.name}</Link></h3>
                         <div className='flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity'>
-                            <Tooltip title="Edit Log">
+                            <Tooltip title="Edit">
                                 <Button type="text" icon={<EditOutlined />} className='text-gray-500 hover:text-blue-400' onClick={() => openEditModal(review)} />
                             </Tooltip>
-                            <Tooltip title="Purge Record">
+                            <Tooltip title="Delete">
                                 <Button type="text" icon={<DeleteOutlined />} className='text-gray-500 hover:text-red-500' onClick={() => handleDelete(review._id)} />
                             </Tooltip>
                         </div>
