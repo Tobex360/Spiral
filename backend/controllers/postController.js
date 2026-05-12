@@ -5,26 +5,39 @@ require('dotenv').config();
 
 exports.createPost = async(req,res)=>{
     try{
-        const{ gameId, description } = req.body;
+        const { gameId, description } = req.body;
+
+        const parsedGameId = gameId && gameId !== "null"
+            ? Number(gameId)
+            : undefined;
+
         let imageUrl = null;
-        
+
         if(req.file){
             const img = await cloudinary.uploader.upload(req.file.path);
             imageUrl = img.secure_url;
         }
-        const post = await Post.create({
+
+        const postData = {
             user: req.user.userId,
-            gameId,
             description,
             image: imageUrl,
-        });
+        };
+
+        if(parsedGameId){
+            postData.gameId = parsedGameId;
+        }
+
+        const post = await Post.create(postData);
+
         res.status(201).json(post);
 
     }catch(err){
-    console.error(err);
-    res.status(500).json({ message: "Failed to create post" });
+        console.error(err);
+        res.status(500).json({ message: "Failed to create post" });
     }
 };
+
 
 exports.getPostByUser = async(req,res) =>{
     try{

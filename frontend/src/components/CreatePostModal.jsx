@@ -50,7 +50,7 @@ function CreatePostModal({ isOpen, onClose, onPostCreated }) {
   };
 
   const handleSubmit = async () => {
-    if (!description.trim() || !selectedGame) {
+    if (!description.trim()) {
       message.warning('Please fill in all required fields');
       return;
     }
@@ -60,7 +60,10 @@ function CreatePostModal({ isOpen, onClose, onPostCreated }) {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('gameId', selectedGame);
+      // formData.append('gameId', selectedGame);
+      if (selectedGame) {
+        formData.append("gameId", selectedGame);
+      }
       formData.append('description', description);
       if (imageFile) formData.append('file', imageFile);
 
