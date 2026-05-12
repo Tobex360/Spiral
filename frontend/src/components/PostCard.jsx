@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Tooltip, message, Avatar } from 'antd';
+import { Button, Tooltip, message, Avatar, Modal } from 'antd';
 import { 
   EditOutlined, 
   DeleteOutlined, 
@@ -37,17 +37,24 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
   const handleDelete = async () => {
     // Replaced window.confirm with a smoother UI experience if possible, 
     // but kept logic same for functionality.
-    if (window.confirm('PERMANENTLY DELETE THIS DATA ENTRY?')) {
-      try {
-        const user = JSON.parse(localStorage.getItem('user'));
-        const config = { headers: { Authorization: `Bearer ${user.token}` } };
-        await axios.delete(`${API_URL}/posts/${post._id}`, config);
-        message.success('POST PURGED');
-        if (onDelete) onDelete(post._id);
-      } catch (err) {
-        message.error('DELETE FAILED');
-      }
-    }
+    Modal.confirm({
+      title: <span className="text-primary font-audiowide">Delete Post</span>,
+      content: <span className="text-gray-400">This action cannot be undone. Are you sure?</span>,
+      okText: 'Delete',
+      okType: 'danger',
+      centered: true,
+      onOk: async () => {
+        try {
+          const user = JSON.parse(localStorage.getItem('user'));
+          const config = { headers: { Authorization: `Bearer ${user.token}` } };
+          await axios.delete(`${API_URL}/posts/${post._id}`, config);
+          message.success('Post Deleted');
+          if (onDelete) onDelete(post._id);
+        } catch (err) {
+          message.error('Delete Failed');
+        }
+      },
+    })
   };
 
   const handleLike = async () => {
