@@ -19,10 +19,6 @@ function Favorites() {
       const res = await axios.get('/api/wishlist/favorites', {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      
-      // We need to fetch details for each game in the wishlist 
-      // if your backend only returns IDs. If it returns full objects, 
-      // you can just use setWishlist(res.data).
       const detailedGames = await Promise.all(
         res.data.map(async (item) => {
           const gameRes = await axios.get(`/api/games/${item.gameId}`);
