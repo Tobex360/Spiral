@@ -9,7 +9,8 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const userRoutes = require("./routes/userRoutes");
 const wishlistRoutes = require("./routes/wishlistRoutes");
 const followRoutes = require("./routes/followRoutes");
-const postRoutes = require("./routes/postRoutes")
+const postRoutes = require("./routes/postRoutes");
+const commentRoutes = require("./routes/commentRoutes")
 
 require('dotenv').config();
 
@@ -36,6 +37,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/follow',followRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/comments',commentRoutes);
 
 
 //Start Server
