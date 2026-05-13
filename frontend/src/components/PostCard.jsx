@@ -43,8 +43,6 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
   }, [post.gameId, gameName]);
 
   const handleDelete = async () => {
-    // Replaced window.confirm with a smoother UI experience if possible, 
-    // but kept logic same for functionality.
     Modal.confirm({
       title: <span className="text-primary font-audiowide">Delete Post</span>,
       content: <span className="text-gray-400">This action cannot be undone. Are you sure?</span>,
