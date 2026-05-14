@@ -287,8 +287,8 @@ function Profile() {
             value={activityView}
             onChange={setActivityView}
             options={[
-              { label: 'Reviews', value: 'reviews' },
-              { label: 'Posts', value: 'posts' },
+              { label: `Reviews (${reviews.length})`, value: 'reviews' },
+              { label: `posts (${posts.length})`, value: 'posts' },
             ]}
             className="w-full mb-6"
           />
