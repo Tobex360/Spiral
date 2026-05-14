@@ -10,7 +10,7 @@ import {
   MessageOutlined
 } from '@ant-design/icons';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
 const { TextArea } = Input;
 
@@ -26,7 +26,10 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
+  const [commentCount, setCommentCount] = useState(post.commentCount || 0);
   const [showComments, setShowComments] = useState(false);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (post.gameId && !gameName) {
@@ -150,6 +153,7 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
       );
 
       setComments(prev=> [res.data, ...prev]);
+      setCommentCount(prev => prev + 1);
       setCommentText('');
 
     }catch(err){
@@ -169,8 +173,10 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
       });
 
       setComments(prev=> 
-        prev.filter(comment => comment._id == commentId)
+        // prev.filter(comment => comment._id == commentId)
+        prev.filter(comment => comment._id !== commentId)
       );
+      setCommentCount(prev => prev - 1);
       fetchComments();
 
       message.success("Comment deleted")
@@ -202,7 +208,7 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
           />
           <div className="flex flex-col">
             <Link
-              to={`/otheruser/${post.user?._id}`}
+              to={currentUserId === post.user?._id ? `/profile` : `/otheruser/${post.user?._id}`}
               className="text-sm font-audiowide uppercase text-white hover:text-red-500 transition-colors leading-none"
             >
               {post.user?.displayname || post.user?.username}
@@ -246,7 +252,7 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
       </p>
 
       {/* Media Attachment */}
-{post.image && (
+  {post.image && (
   <>
     <div 
       className="w-full h-72 rounded-2xl overflow-hidden border border-white/5 relative bg-black cursor-pointer group/media"
@@ -374,15 +380,18 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
                     src={comment.user?.profilePic}
                     size="small"
                     icon={<UserOutlined />}
+                    onClick={()=> navigate(currentUserId === comment.user?._id ? `/profile` : `/otheruser/${comment.user?._id}`)}
                     className="flex-shrink-0 border border-white/5"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="bg-white/[0.03] rounded-2xl rounded-tl-none p-3 border border-white/5 relative">
                       <div className="flex justify-between items-baseline mb-1">
                         <div className="flex items-baseline gap-2">
+                          <Link to={currentUserId === comment.user?._id ? `/profile` : `/otheruser/${comment.user?._id}`}>
                           <span className="text-xs font-audiowide text-red-500 uppercase">
                             {comment.user?.displayname || comment.user?.username}
                           </span>
+                          </Link>
                           <span className="text-[9px] text-gray-600 font-tomorrow uppercase">
                             @{comment.user?.username}
                           </span>
@@ -443,7 +452,7 @@ function PostCard({ post, onUpdate, onDelete, currentUserId }) {
             </div>
 
             <span className="font-tomorrow">
-              {comments.length}
+              {commentCount}
             </span>
           </button>
         </div>

@@ -1,5 +1,6 @@
 const Post = require("../models/post");
 const cloudinary = require("../config/cloudinary");
+const Comments = require("../models/comment")
 require('dotenv').config();
 
 
@@ -47,6 +48,10 @@ exports.getPostByUser = async(req,res) =>{
         .populate("user", "username displayname profilePic")
         .sort({ createdAt: -1 });
 
+        for(let post of posts){
+            post.commentCount = await Comments.countDocuments({ post: post._id })
+        }
+
         res.json(posts);
     }catch(err){
         console.log(err);
@@ -60,6 +65,10 @@ exports.getPostByGame = async(req,res) =>{
         const posts = await Post.find({ gameId })
         .populate("user", "username displayname profilePic")
         .sort({ createdAt: -1 });
+
+        for(let post of posts){
+            post.commentCount = await Comments.countDocuments({ post: post._id })
+        }
 
         res.json(posts);
     }catch(err){
