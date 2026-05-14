@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import UserAvatar from '../../assets/no_avatar.webp';
-import { Spin, Rate, message, Empty, Tooltip, Button, Segmented } from 'antd';
+import { Spin, Rate, message, Empty, Tooltip, Button, Segmented, Modal } from 'antd';
 import {
   UserOutlined,
   MessageOutlined,
@@ -29,6 +29,7 @@ function OtherUser() {
   const [posts, setPosts] = useState([]);
   const [activityView, setActivityView] = useState('reviews'); // 'reviews' or 'posts'
   const [loading, setLoading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const navigate = useNavigate();
 
   // Fetch target user profile
@@ -172,7 +173,8 @@ function OtherUser() {
         <img
             src={ouser?.profilePic || UserAvatar}
             alt="Avatar"
-            className='relative w-40 h-40 rounded-full border-8 border-[#050505] object-cover bg-[#111]'
+            className='relative w-40 h-40 rounded-full border-8 border-[#050505] object-cover bg-[#111] hover:cursor-pointer'
+            onClick={()=>setPreviewOpen(true)}
         />
     </div>
 
@@ -350,6 +352,55 @@ function OtherUser() {
           )}
         </section>
       </div>
+      {/* IMAGE PREVIEW MODAL - High End Overlay */}
+    <Modal
+      open={previewOpen}
+      footer={null}
+      onCancel={() => setPreviewOpen(false)}
+      centered
+      width="auto"
+      closeIcon={null} // Remove default X
+      modalRender={(modal) => (
+        <div className="relative group/close">
+          {/* Custom Close Button */}
+          <button 
+            onClick={() => setPreviewOpen(false)}
+            className="absolute -top-12 right-0 text-white/50 hover:text-red-500 transition-colors flex items-center gap-2 font-tomorrow text-xs tracking-widest"
+          >
+            CLOSE [ESC]
+          </button>
+          {modal}
+        </div>
+      )}
+      styles={{
+        mask: {
+          backdropFilter: 'blur(12px)',
+          background: 'rgba(0, 0, 0, 0.85)',
+        },
+        content: {
+          background: 'transparent',
+          boxShadow: 'none',
+          padding: 0,
+        },
+        body: {
+          padding: 0,
+          background: 'transparent',
+          display: 'flex',
+          justifyContent: 'center',
+        }
+      }}
+    >
+      <div className="relative max-w-[95vw] lg:max-w-[80vw]">
+        {/* Glow effect behind the image */}
+        <div className="absolute -inset-4 bg-red-600/10 blur-[100px] rounded-full opacity-50" />
+        
+        <img
+          src={ouser?.profilePic || UserAvatar}
+          alt="Preview"
+          className="relative z-10 w-full max-h-[85vh] object-contain border border-white/10 shadow-2xl"
+        />
+      </div>
+    </Modal>
     </main>
   );
 }
