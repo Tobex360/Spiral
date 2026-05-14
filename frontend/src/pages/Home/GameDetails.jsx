@@ -441,10 +441,9 @@ function GameDetails() {
                       : "border-white/10 bg-white/5 hover:bg-white/[0.08]"
                   }`}
                 >
-                  {/* ... internal review card logic stays the same ... */}
                   <div className="flex justify-between items-start gap-4 mb-4">
                     <div className="flex-1 min-w-0">
-                      <Link to={`/otheruser/${r.userId?._id}`}>
+                      <Link to={!isMine ? `/otheruser/${r.userId?._id}` : `/profile` }>
                         <p className={`font-bold text-sm truncate tracking-tight ${
                           isMine ? "text-red-400" : "text-red-500 hover:text-red-400"
                         }`}>
