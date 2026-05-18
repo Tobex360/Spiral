@@ -17,4 +17,6 @@ router.put("/update-profile",
     authenticateToken,
     AuthController.updateUserProfile);
 
+router.post('/google-login',AuthController.googleLogin);
+
 module.exports = router;
