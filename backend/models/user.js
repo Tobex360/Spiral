@@ -31,6 +31,10 @@ const userSchema = new Schema({
         type:String,
         required:true
     },
+    authProvider:{
+        type:String,
+        default: 'local'
+    },
 },
 {
     timestamps: true
@@ -39,8 +43,8 @@ const userSchema = new Schema({
 userSchema.pre("save",async function(){
     const user = this;
     if (!user.isModified('password'))return;
-    //Add dont hash if its a google account
-    // if (user.authProvider === 'google') return;
+    // Add dont hash if its a google account
+    if (user.authProvider === 'google') return;
     let salt =await bcrypt.genSalt(10);
     let hash = await bcrypt.hash(user.password, salt);
     user.password = hash;
