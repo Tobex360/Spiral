@@ -11,6 +11,8 @@ import {
 import './login.css';
 import axios from 'axios';
 import AuthServices from '../../services/authServices';
+import { GoogleLogin } from '@react-oauth/google';
+import { API_URL } from '../../config/api';
 import Password from 'antd/es/input/Password';
 
 const { Title, Text } = Typography;
@@ -38,6 +40,31 @@ function Login() {
       setLoading(false)
     }
   }
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+  try {
+    // console.log("Google response:", credentialResponse);
+
+    // Send token to backend
+    const res = await axios.post(
+      `${API_URL}/user/google-login`,
+      {
+        token: credentialResponse.credential
+      }
+    );
+
+    localStorage.setItem("user", JSON.stringify(res.data));
+    message.success("Google login successful");
+    window.dispatchEvent(new Event('authChange'));
+    navigate("/home");
+
+  } catch (err) {
+    console.log(err);
+    message.error("Google login failed");
+  }
+};
+
+
   return (
     <div className="login-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '20px' }}>
       <Card 
@@ -92,7 +119,7 @@ function Login() {
               Login
             </Button>
           </Form.Item>
-          {/* <Form.Item>
+          <Form.Item>
             <div style={{ textAlign: "center", marginTop: "10px" }}>
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
@@ -102,7 +129,7 @@ function Login() {
                 text="signin_with"
               />
             </div>
-          </Form.Item> */}
+          </Form.Item>
 
           <div style={{ textAlign: 'center', color: '#ED1C24'}}>
             <div>

@@ -10,6 +10,8 @@ import {
   PhoneOutlined, 
   LockOutlined 
 } from '@ant-design/icons';
+import { GoogleLogin } from '@react-oauth/google';
+import { API_URL } from '../../config/api';
 import axios from 'axios';
 
 const { Title, Text } = Typography;
@@ -39,6 +41,28 @@ function Register() {
       setLoading(false);
     }
   }
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      // console.log("Google response:", credentialResponse);
+  
+      // Send token to backend
+      const res = await axios.post(
+        `${API_URL}/user/google-login`,
+        {
+          token: credentialResponse.credential
+        }
+      );
+  
+      localStorage.setItem("user", JSON.stringify(res.data));
+      message.success("Google login successful");
+      navigate("/home");
+  
+    } catch (err) {
+      console.log(err);
+      message.error("Google login failed");
+    }
+  };
 
 
 
@@ -114,7 +138,7 @@ function Register() {
               Register
             </Button>
           </Form.Item>
-          {/* <Form.Item>
+          <Form.Item>
             <div style={{ textAlign: "center", marginTop: "10px" }}>
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
@@ -124,7 +148,7 @@ function Register() {
                 text="signin_with"
               />
             </div>
-          </Form.Item> */}
+          </Form.Item>
 
           <div style={{ textAlign: 'center', color: '#ED1C24' }}>
             <div type="secondary">
