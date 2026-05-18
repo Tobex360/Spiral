@@ -2,6 +2,8 @@ const User = require('../models/user');
 const cloudinary = require("../config/cloudinary");
 const jwt = require('jsonwebtoken');
 const authenticateToken = require('../middleware/awtjwt');
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 require('dotenv').config();
 
 const secretKey = process.env.JWT_SECRET;
@@ -62,6 +64,56 @@ async function loginUser(req,res){
     }catch(err){console.log(`full Error: ${err}`)}
 }
 
+async function googleLogin(req,res) {
+    console.log("Body recived:", req.body);
+    try{
+        const { token } = req.body;
+
+        if (!token) return res.status(400).json({ error: "Missing Goole token" });
+
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+
+        const payload = ticket.getPayload();
+        const { email, name } = payload;
+        const username = email.split("@")[0];
+
+        let user = await User.findOne({ email });
+        if(!user){
+            user = new User({
+                firstname: name,
+                username,
+                email,
+                password: payload.sub,
+                authProvider: 'google'
+            });
+            await user.save();
+        }
+
+        const jwtToken = jwt.sign(
+            { userId: user._id },
+            secretKey,
+            { expiresIn: "3h"}
+        );
+
+        return res.json({
+            userid: user._id,
+            username: user.username,
+            firstname: user.firstname,
+            email: user.email,
+            displayname: user.displayname,
+            bio: user.bio,
+            profilePic: user.profilePic,
+            token: jwtToken
+        });
+    } catch(err){
+        console.error("Google login error:", err);
+        res.status(400).json({ error: "Google login failed" });
+    }
+}
+
 
  async function uploadProfilePic(req, res){
     console.log(req.file);
@@ -109,6 +161,7 @@ const AuthController = {
     loginUser,
     uploadProfilePic,
     updateUserProfile,
+    googleLogin
 }
 
 module.exports = AuthController;
