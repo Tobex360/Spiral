@@ -1,5 +1,5 @@
 const getApiUrl = () =>{
-    return 'http://localhost:2001/api';
+    return import.meta.env.VITE_API_URL;
 };
 
 
