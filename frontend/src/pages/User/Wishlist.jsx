@@ -19,10 +19,7 @@ function Wishlist() {
       const res = await axios.get('/api/wishlist/wishlists', {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      
-      // We need to fetch details for each game in the wishlist 
-      // if your backend only returns IDs. If it returns full objects, 
-      // you can just use setWishlist(res.data).
+
       const detailedGames = await Promise.all(
         res.data.map(async (item) => {
           const gameRes = await axios.get(`/api/games/${item.gameId}`);
@@ -85,7 +82,7 @@ function Wishlist() {
           {loading ? (
             <div className="flex flex-col justify-center items-center h-96 gap-4">
               <Spin size="large" />
-              <p className="text-gray-500 font-tomorrow text-xs animate-pulse uppercase">Decrypting Wishlist...</p>
+              <p className="text-gray-500 font-tomorrow text-xs animate-pulse uppercase">Fetching Wishlist...</p>
             </div>
           ) : wishlist.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
