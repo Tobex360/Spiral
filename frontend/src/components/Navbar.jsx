@@ -233,7 +233,7 @@ function Navbar() {
       isOpen={isPostModalOpen}
       onClose={() => setIsPostModalOpen(false)}
       onPostCreated={() => {
-        // Optionally refresh data or navigate
+        window.location.reload();
       }}
     />
     </>
