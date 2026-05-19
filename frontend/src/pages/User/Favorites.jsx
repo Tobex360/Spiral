@@ -39,9 +39,10 @@ function Favorites() {
       await axios.delete(`/api/wishlist/${gameId}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setWishlist(prev => prev.filter(game => game.id !== gameId));
+      setFavorites(prev => prev.filter(game => game.id !== gameId));
       message.success("Removed from Archive");
     } catch (err) {
+      console.log(err);
       message.error("Failed to remove games");
     }
   };
