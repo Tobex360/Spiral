@@ -14,7 +14,7 @@ const commentRoutes = require("./routes/commentRoutes")
 
 require('dotenv').config();
 
-const DB_URL = process.env.DB_URL;
+const DB_URL = process.env.DB_URL2;
 const PORT = process.env.PORT || 2001;
 
 //Enable Cors
