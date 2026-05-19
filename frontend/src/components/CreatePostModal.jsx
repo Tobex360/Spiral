@@ -168,7 +168,7 @@ function CreatePostModal({ isOpen, onClose, onPostCreated, initialGameId, initia
           </label>
           <Select
             showSearch
-            placeholder="Search game title..."
+            placeholder="Search game title (Optional)..."
             value={selectedGame}
             onChange={setSelectedGame}
             onSearch={handleGameSearch}
