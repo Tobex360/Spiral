@@ -12,9 +12,11 @@ import { EditOutlined,
         HeartOutlined,
         StarFilled,
         StarOutlined,
-        DislikeFilled } from "@ant-design/icons";
+        DislikeFilled,
+        PlusOutlined } from "@ant-design/icons";
 import { Link } from 'react-router-dom';
 import PostCard from "../../components/PostCard";
+import CreatePostModal from "../../components/CreatePostModal";
 
 const { TextArea } = Input;
 
@@ -33,6 +35,7 @@ function GameDetails() {
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [averageRating, setAverageRating] = useState(0);
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
   // Form State
   const [rating, setRating] = useState(5);
@@ -306,6 +309,20 @@ function GameDetails() {
         {/* TOP RIGHT ACTIONS CORNER */}
         <div className="absolute top-6 right-6 z-30 flex flex-col gap-3">
           
+          <button
+            onClick={() => {
+              if (!currentUser) {
+                message.error('Please log in to create a post');
+                navigate('/login');
+                return;
+              }
+              setIsPostModalOpen(true);
+            }}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md border shadow-lg bg-black/40 border-white/10 text-white hover:border-red-500 hover:text-red-500"
+            title="Create a Post"
+          >
+            <PlusOutlined className="text-xl" />
+          </button>
           
           <button
             onClick={()=>toggleFavorite(gameId)}
@@ -527,6 +544,16 @@ function GameDetails() {
           </div>
         </div>
       </Modal>
+      <CreatePostModal
+        isOpen={isPostModalOpen}
+        onClose={() => setIsPostModalOpen(false)}
+        onPostCreated={() => {
+          fetchPosts();
+          setIsPostModalOpen(false);
+        }}
+        initialGameId={game?.id}
+        initialGameName={game?.name}
+      />
     </main>
   );
 }

@@ -6,7 +6,7 @@ import { API_URL } from '../config/api';
 
 const { TextArea } = Input;
 
-function CreatePostModal({ isOpen, onClose, onPostCreated }) {
+function CreatePostModal({ isOpen, onClose, onPostCreated, initialGameId, initialGameName }) {
   const [description, setDescription] = useState('');
   const [selectedGame, setSelectedGame] = useState(null);
   const [gameOptions, setGameOptions] = useState([]);
@@ -15,6 +15,20 @@ function CreatePostModal({ isOpen, onClose, onPostCreated }) {
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
   const fileInputRef = useRef(null);
+
+  // Pre-fill game when initialGameId is provided
+  React.useEffect(() => {
+    if (initialGameId && isOpen) {
+      setSelectedGame(initialGameId);
+      if (initialGameName) {
+        setGameOptions([{
+          label: initialGameName,
+          value: initialGameId,
+          image: null
+        }]);
+      }
+    }
+  }, [initialGameId, initialGameName, isOpen]);
 
   const handleGameSearch = async (value) => {
     if (!value || value.length < 2) {
@@ -88,6 +102,7 @@ function CreatePostModal({ isOpen, onClose, onPostCreated }) {
   const handleCancel = () => {
     setDescription('');
     setSelectedGame(null);
+    setGameOptions([]);
     setImageFile(null);
     setImagePreview(null);
     onClose();
