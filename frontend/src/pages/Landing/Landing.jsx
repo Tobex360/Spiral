@@ -21,8 +21,8 @@ const FEATURES = [
     reversed: true,
   },
   {
-    title: "Find out the latest gaming news",
-    desc: "Stay ahead of the curve with our dedicated news board featuring updates, patches, and industry leaks.",
+    title: "Find Your Community",
+    desc: "Find and communicate with other people playing the same games with you",
     img: H4,
     reversed: false,
   },
