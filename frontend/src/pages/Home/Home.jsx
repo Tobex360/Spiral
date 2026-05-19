@@ -30,7 +30,6 @@ function Home() {
       const res = await axios.get(
         `/api/games?search=${search}&page=${page}&ordering=${ordering}${genre ? `&genre=${genre}` : ''}`
       )
-      console.log("GENRE:", genre);
       setGames(res.data.results)
       setTotal(res.data.count)
       
@@ -127,7 +126,12 @@ function Home() {
                 }}
                 allowClear
                 className="w-56 custom-genre-select"
-                dropdownClassName="bg-[#111] border border-white/10"
+                // dropdownClassName="bg-[#111] border border-white/10"
+                classNames={{
+                  popup: {
+                    root: "bg-[#111] border border-white/10"
+                  }
+                }}
                 options={[
                   { value: 'action', label: 'ACTION' },
                   { value: 'adventure', label: 'ADVENTURE' },
