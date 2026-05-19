@@ -374,9 +374,6 @@ function Profile() {
             <label className='text-[10px] uppercase text-gray-500 font-black tracking-widest block mb-2'>Your Bio</label>
             <TextArea value={editBio} onChange={(e) => setEditBio(e.target.value)} autoSize={{ minRows: 3 }} className='rounded-xl p-4' />
           </div>
-          <Button block type="dashed" className="text-gray-400 border-gray-300 h-12 rounded-xl" onClick={() => { setIsEditProfileModalOpen(false); setIsProfilePicModalOpen(true); }}>
-            Change Profile Picture
-          </Button>
         </div>
       </Modal>
 
