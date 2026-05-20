@@ -9,6 +9,7 @@ import Footer from './components/Footer'
 import BackToTop from './components/BackToTop'
 
 import Home from './pages/Home/Home'
+import Feed from './pages/Home/Feed'
 import Profile from './pages/User/Profile'
 import GameDetails from './pages/Home/GameDetails'
 import OtherUser from './pages/User/OtherUser'
@@ -28,6 +29,7 @@ function App() {
 
 
         <Route path='/home' element={<Home />} />
+        <Route path='/feed' element={<Feed />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/wishlist' element={<Wishlist />} />
         <Route path='/favorites' element={<Favorites />} />
