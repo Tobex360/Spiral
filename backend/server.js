@@ -49,7 +49,7 @@ app.listen(PORT,()=>{
 mongoose.connect(DB_URL).then((result)=>{
     console.log('succesfully connected to mongodb')
 }).catch(err=>{
-    console.err('MongoDB connection failed');
+    console.log('MongoDB connection failed');
     console.error('Full error:', err);
 
 })
