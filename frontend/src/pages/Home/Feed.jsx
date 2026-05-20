@@ -5,7 +5,7 @@ import axios from 'axios';
 import { API_URL } from '../../config/api';
 import { useNavigate } from 'react-router-dom';
 import PostCard from '../../components/PostCard';
-import ReviewCard from '../../components/ReviewCard'; // Imported out of loop context
+import ReviewCard from '../../components/ReviewCard';
 
 function Feed() {
   const [feed, setFeed] = useState([]);
@@ -91,7 +91,7 @@ function Feed() {
   }
 
   return (
-    <div className="max-w-[900px] mx-auto px-4 py-6 md:px-5 md:py-8 min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#1b183a] to-[#24243e]">
+    <div className="max-w-[900px] mx-auto px-4 py-6 md:px-5 md:py-8 min-h-screen bg-secondary">
       
       {/* Feed Header */}
       <div className="mb-8 pb-5 border-b border-white/5">
