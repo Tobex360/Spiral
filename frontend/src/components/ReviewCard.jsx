@@ -69,7 +69,7 @@ function ReviewCard({ review, currentUserId, onDelete }) {
 
       <div className="mb-3">
         <span className="text-[10px] uppercase font-tomorrow text-gray-600 tracking-widest block mb-0.5">GAME:</span>
-        <Link to={`/game-details/${review.gameId}`} className="inline-block group/link">
+        <Link to={`/gamedetails/${review.gameId}`} className="inline-block group/link">
           <p className="text-red-500 font-audiowide text-sm uppercase tracking-wide transition-colors group-hover/link:text-red-400 group-hover/link:underline decoration-red-500/30 underline-offset-4">
             {gameName || 'Querying Database...'}
           </p>
