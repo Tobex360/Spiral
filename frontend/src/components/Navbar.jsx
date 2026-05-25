@@ -160,7 +160,7 @@ function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden sm:flex items-center gap-8">
           <div className="flex gap-6">
-            <NavLink to="/feed" label="Home" />
+            <NavLink to="/feed" label="Feed" />
             <NavLink to="/home" label="Games" />
           </div>
           
@@ -203,7 +203,7 @@ function Navbar() {
     {/* Mobile Navigation Menu */}
     <div className={`sm:hidden bg-secondary overflow-hidden transition-all duration-300 ease-in-out ${open ? 'max-h-64 border-b border-[#0D4715]/10' : 'max-h-0'}`}>
       <div className="px-4 pt-2 pb-6 space-y-2 flex flex-col items-center">
-        <Link to="/feed" className="w-full text-center py-3 text-primary text-lg font-audiowide hover:bg-[#0D4715]/5 rounded-lg">Home</Link>
+        <Link to="/feed" className="w-full text-center py-3 text-primary text-lg font-audiowide hover:bg-[#0D4715]/5 rounded-lg">Feed</Link>
         <Link to="/home" className="w-full text-center py-3 text-primary text-lg font-audiowide hover:bg-[#0D4715]/5 rounded-lg">Games</Link>
 
         <button
