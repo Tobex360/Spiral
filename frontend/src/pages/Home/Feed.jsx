@@ -99,7 +99,7 @@ function Feed() {
           For You
         </h1>
         <p className="text-gray-400 text-xs md:text-sm font-tomorrow mt-2 tracking-wide">
-          Data streams and log files from verified units and favorited sectors.
+          Latest Reviews from your favorite games and friends.
         </p>
       </div>
 
