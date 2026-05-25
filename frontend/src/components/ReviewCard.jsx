@@ -40,7 +40,7 @@ function ReviewCard({ review, currentUserId, onDelete }) {
             />
           </Link>
           <div>
-            <Link to={`/user/${review.userId?._id}`} className="text-white hover:text-red-400 font-audiowide text-xs uppercase tracking-wider block transition-colors">
+            <Link to={`/otheruser/${review.userId?._id}`} className="text-white hover:text-red-400 font-audiowide text-xs uppercase tracking-wider block transition-colors">
               {review.userId?.displayname || review.userId?.username || "Anonymous Operational Unit"}
             </Link>
             
