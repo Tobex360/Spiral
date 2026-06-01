@@ -31,7 +31,7 @@ function ReviewCard({ review, currentUserId, onDelete }) {
 
       <div className="flex justify-between items-start mb-4">
         <div className="flex gap-3 items-center">
-          <Link to={`/user/${review.userId?._id}`} className="flex-shrink-0">
+          <Link to={`/otheruser/${review.userId?._id}`} className="flex-shrink-0">
             <Avatar
               size={40}
               src={review.userId?.profilePic}
