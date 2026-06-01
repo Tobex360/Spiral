@@ -173,7 +173,7 @@ function OtherUser() {
         <img
             src={ouser?.profilePic || UserAvatar}
             alt="Avatar"
-            className='relative w-40 h-40 rounded-full border-8 border-[#050505] object-cover bg-[#111] hover:cursor-pointer'
+            className='relative w-40 h-40 rounded-full border-8 border-[#050505] object-cover bg-[#111] hover:cursor-pointer hover:opacity-80'
             onClick={()=>setPreviewOpen(true)}
         />
     </div>
