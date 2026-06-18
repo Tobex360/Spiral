@@ -26,7 +26,7 @@ app.use(cors())
 //Parse json bodies
 app.use(express.json());
 //RateLimiter
-app.use(apiLimiter);
+// app.use(apiLimiter);
 
 //health route
 app.get('/api/health',(req, res)=>{
