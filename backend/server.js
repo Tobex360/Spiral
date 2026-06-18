@@ -2,7 +2,8 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
-const path = require('path')
+const path = require('path');
+const apiLimiter = require("./middleware/rateLimiter");
 const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require("./routes/gameRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
@@ -24,6 +25,8 @@ app.use(cors())
 
 //Parse json bodies
 app.use(express.json());
+//RateLimiter
+app.use(apiLimiter);
 
 //health route
 app.get('/api/health',(req, res)=>{
