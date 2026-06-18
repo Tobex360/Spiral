@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import PostCard from '../../components/PostCard';
+import { API_URL } from '../../config/api';
 
 function OtherUser() {
   const { usersId } = useParams();
@@ -36,7 +37,7 @@ function OtherUser() {
   const fetchUser = async (id) => {
     try {
       setLoading(true);
-      const res = await axios.get(`http://localhost:2001/api/users/${id}`);
+      const res = await axios.get(`${API_URL}/users/${id}`);
       setOuser(res.data);
     } catch (err) {
       message.error("Failed to load User");
@@ -47,7 +48,7 @@ function OtherUser() {
 
   const fetchReviews = async (id) => {
     try {
-      const res = await axios.get(`http://localhost:2001/api/users/${id}/reviews`);
+      const res = await axios.get(`${API_URL}/users/${id}/reviews`);
       setReviews(res.data);
     } catch (err) {
       message.error("Failed to load reviews");
@@ -56,7 +57,7 @@ function OtherUser() {
 
   const fetchPosts = async (id) => {
     try {
-      const res = await axios.get(`http://localhost:2001/api/posts/user/${id}`);
+      const res = await axios.get(`${API_URL}/posts/user/${id}`);
       setPosts(res.data);
     } catch (err) {
       console.error('Failed to load posts:', err);
@@ -71,7 +72,7 @@ function OtherUser() {
       return;
     }
     try {
-      await axios.put(`http://localhost:2001/api/reviews/${reviewId}/like`, {}, 
+      await axios.put(`${API_URL}/reviews/${reviewId}/like`, {}, 
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       fetchReviews(usersId);
@@ -85,7 +86,7 @@ function OtherUser() {
       return;
     }
     try {
-      await axios.put(`http://localhost:2001/api/reviews/${reviewId}/dislike`, {}, 
+      await axios.put(`${API}/reviews/${reviewId}/dislike`, {}, 
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       fetchReviews(usersId);
@@ -94,7 +95,7 @@ function OtherUser() {
 
   const fetchFollowing = async (user) => {
     try {
-      const res = await axios.get(`http://localhost:2001/api/follow/following/${user.userid}`, {
+      const res = await axios.get(`${API_URL}/follow/following/${user.userid}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setFollowing(res.data);
@@ -103,7 +104,7 @@ function OtherUser() {
 
   const fetchFollowStats = async (id) => {
     try {
-      const res = await axios.get(`http://localhost:2001/api/follow/stats/${id}`);
+      const res = await axios.get(`${API_URL}/follow/stats/${id}`);
       setFollowStats(res.data);
     } catch (err) { console.log(`Error Fetching followStats ${err}`); }
   };
@@ -123,12 +124,12 @@ function OtherUser() {
     try {
       const exists = isFollowing(id);
       if (exists) {
-        await axios.delete(`http://localhost:2001/api/follow/${id}`, {
+        await axios.delete(`${API_URL}/follow/${id}`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setFollowing(prev => prev.filter(f => f.following._id !== id));
       } else {
-        await axios.post('http://localhost:2001/api/follow', { userId: id }, {
+        await axios.post(`${API_URL}/follow`, { userId: id }, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setFollowing(prev => [...prev, { following: { _id: id } }]);

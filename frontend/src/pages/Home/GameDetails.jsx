@@ -17,6 +17,7 @@ import { EditOutlined,
 import { Link } from 'react-router-dom';
 import PostCard from "../../components/PostCard";
 import CreatePostModal from "../../components/CreatePostModal";
+import { API_URL } from "../../config/api";
 
 const { TextArea } = Input;
 
