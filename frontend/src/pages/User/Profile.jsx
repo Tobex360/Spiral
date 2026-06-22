@@ -26,8 +26,7 @@ function Profile() {
   const [activityView, setActivityView] = useState('reviews'); // 'reviews' or 'posts'
   const [loading, setLoading] = useState(false);
   const [followStats, setFollowStats] = useState({ followers: 0, following: 0 });
-
-  // Modals & Forms State
+  
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
   const [editRating, setEditRating] = useState(5);
