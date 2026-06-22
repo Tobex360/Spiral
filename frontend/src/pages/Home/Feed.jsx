@@ -65,14 +65,9 @@ function Feed() {
     }
   };
 
-  // Modern Antd Loading Indicator
-  const antIcon = <LoadingOutlined className="text-red-500 text-4xl" spin />;
-
   if (loading) {
     return (
-      <div className="max-w-[600px] mx-auto px-4 md:px-5 min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#1b183a] to-[#24243e] flex justify-center items-center">
-        <Spin indicator={antIcon} />
-      </div>
+      <div className="py-20 text-center"><Spin size="large"  /></div>
     );
   }
 
